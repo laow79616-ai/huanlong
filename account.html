@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account – Nothosaur</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .account-wrap { max-width: 720px; margin: 0 auto; padding: 20px 16px 60px; }
+    .account-wrap h1 { font-size: 1.4rem; margin-bottom: 6px; }
+    .welcome { color: var(--text-muted); margin-bottom: 24px; font-size: 0.95rem; }
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px; margin-bottom: 16px;
+    }
+    .card h2 { font-size: 1rem; color: var(--pink); margin-bottom: 14px; }
+    .order-item {
+      padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem;
+    }
+    .order-item:last-child { border-bottom: none; }
+    .addr-item {
+      padding: 12px; background: #0d0d0d; border: 1px solid var(--border);
+      border-radius: 8px; margin-bottom: 10px; font-size: 0.88rem;
+    }
+    .empty { color: var(--text-muted); font-size: 0.9rem; padding: 12px 0; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <svg viewBox="0 0 40 40" fill="none"><path d="M20 4 C12 8 6 16 8 26 C10 32 16 36 20 36 C24 36 30 32 32 26 C34 16 28 8 20 4 Z" fill="#ff1493"/></svg>
+        <span>NOTHOSAUR</span>
+      </a>
+      <div class="header-actions">
+        <a href="collections.html" style="font-size:0.9rem;color:var(--text-muted);">Shop</a>
+        <button onclick="openCart()" title="Cart">🛒 <span class="cart-count" style="display:none">0</span></button>
+      </div>
+    </div>
+  </header>
+
+  <div class="account-wrap">
+    <h1>My Account</h1>
+    <div class="welcome" id="welcome">Loading...</div>
+
+    <div class="card">
+      <h2>My Orders</h2>
+      <div id="my-orders"><div class="empty">No orders yet</div></div>
+    </div>
+
+    <div class="card">
+      <h2>Saved Addresses</h2>
+      <div id="my-addresses"><div class="empty">No saved addresses</div></div>
+    </div>
+
+    <div class="actions">
+      <a href="collections.html" class="btn" style="text-decoration:none;">Continue Shopping</a>
+      <button class="btn" style="background:#30363d;" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+  <div class="cart-drawer" id="cart-drawer">
+    <div class="cart-header">
+      <h3>Your Cart</h3>
+      <button onclick="closeCart()" style="background:none;border:none;color:#fff;font-size:1.4rem;cursor:pointer;">×</button>
+    </div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-footer">
+      <div class="cart-total"><span>Total</span><span id="cart-total-price">$0.00</span></div>
+      <button class="btn" style="width:100%;" onclick="location.href='checkout.html'">Checkout</button>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    const SESSION_KEY = 'nothosaur_demo_session';
+    const ADDR_KEY = 'nothosaur_demo_addresses';
+
+    function getSession() {
+      try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); }
+      catch(e) { return null; }
+    }
+
+    function doLogout() {
+      localStorage.removeItem(SESSION_KEY);
+      location.href = 'login.html';
+    }
+
+    function loadAccount() {
+      const session = getSession();
+      if (!session) {
+        location.href = 'login.html';
+        return;
+      }
+      document.getElementById('welcome').textContent = 'Hello, ' + session.name + ' · ' + session.email;
+
+      // Orders – match by customer name (demo)
+      const orders = JSON.parse(localStorage.getItem('nothosaur_demo_orders') || '[]');
+      const mine = orders.filter(o => o.customer === session.name || (o.shipping && o.shipping.name === session.name));
+      const ordersEl = document.getElementById('my-orders');
+      if (!mine.length) {
+        ordersEl.innerHTML = '<div class="empty">No orders yet. <a href="collections.html" style="color:var(--pink);">Start shopping</a></div>';
+      } else {
+        ordersEl.innerHTML = mine.map(o => `
+          <div class="order-item">
+            <div style="font-weight:600;">#${o.id} · $${Number(o.amount).toFixed(2)}</div>
+            <div style="color:var(--text-muted);margin-top:4px;">${o.product}</div>
+            <div style="color:var(--text-muted);margin-top:4px;font-size:0.82rem;">${o.time} · ${o.status}</div>
+          </div>
+        `).join('');
+      }
+
+      // Addresses
+      const addrs = JSON.parse(localStorage.getItem(ADDR_KEY) || '[]');
+      const addrEl = document.getElementById('my-addresses');
+      if (!addrs.length) {
+        addrEl.innerHTML = '<div class="empty">No saved addresses. They appear after checkout.</div>';
+      } else {
+        addrEl.innerHTML = addrs.map(a => `
+          <div class="addr-item">
+            <strong>${a.name}</strong> · ${a.phone}<br>
+            ${a.street}, ${a.city}${a.region ? ', ' + a.region : ''} ${a.postal}<br>
+            ${a.country}
+          </div>
+        `).join('');
+      }
+    }
+
+    loadAccount();
+  </script>
+</body>
+</html>

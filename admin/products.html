@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商品管理 – Nothosaur Demo</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open {
+      display: flex;
+    }
+    .modal {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+    }
+    .modal h2 {
+      font-size: 1.25rem;
+      margin-bottom: 22px;
+      color: #ff1493;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: #8b949e;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      color: #e6edf3;
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #ff1493;
+    }
+    .form-group textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      justify-content: flex-end;
+    }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid #30363d;
+      color: #e6edf3;
+      padding: 10px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .btn-secondary:hover {
+      border-color: #8b949e;
+    }
+    .btn-danger {
+      background: transparent;
+      border: 1px solid #f87171;
+      color: #f87171;
+      padding: 10px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .tip {
+      font-size: 0.8rem;
+      color: #8b949e;
+      margin-top: 16px;
+      padding: 12px;
+      background: #0d1117;
+      border-radius: 6px;
+      border: 1px solid #30363d;
+    }
+  </style>
+<script>
+(function(){
+  if (sessionStorage.getItem('nothosaur_admin_session') !== '1') {
+    location.href = 'login.html';
+  }
+})();
+</script>
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="logo" style="color:#ff1493;font-weight:700;font-size:1.1rem;">
+        NOTHOSAUR 后台
+      </div>
+      <nav class="admin-nav">
+        <a href="index.html">仪表盘</a>
+        <a href="products.html" class="active">商品管理</a>
+        <a href="orders.html">订单管理</a>
+        <a href="members.html">会员列表</a>
+        <a href="inquiries.html">客户咨询</a>
+        <a href="content.html">内容发布</a>
+        <a href="stats.html">数据统计</a>
+        <a href="settings.html">系统设置</a>
+        <a href="../index.html" style="margin-top:24px;color:#ff1493;">← 返回前台</a>
+        <a href="login.html" onclick="sessionStorage.removeItem('nothosaur_admin_session')" style="color:#f87171;">退出登录</a>
+      </nav>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-header">
+        <h1>商品管理</h1>
+        <button class="btn" style="padding:10px 20px;font-size:0.9rem;" onclick="openAddModal()">+ 新增商品</button>
+      </div>
+
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>图片</th>
+            <th>商品名称</th>
+            <th>价格</th>
+            <th>库存状态</th>
+            <th>标签</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="admin-product-list">
+          <!-- filled by JS -->
+        </tbody>
+      </table>
+
+      <div class="tip">
+        <strong style="color:#ff1493;">说明：</strong>
+        编辑 / 新增 / 删除 会保存到浏览器本地（localStorage）。刷新前台页面即可看到变化。
+        如需恢复原始数据，可在浏览器控制台执行：<code style="color:#ff6ec7;">localStorage.removeItem('nothosaur_demo_products')</code> 然后刷新。
+      </div>
+    </main>
+  </div>
+
+  <!-- Edit / Add Modal -->
+  <div class="modal-overlay" id="product-modal">
+    <div class="modal">
+      <h2 id="modal-title">编辑商品</h2>
+      <input type="hidden" id="edit-id">
+
+      <div class="form-group">
+        <label>商品名称 *</label>
+        <input type="text" id="edit-name" placeholder="例如：Ignis">
+      </div>
+      <div class="form-group">
+        <label>副标题</label>
+        <input type="text" id="edit-subtitle" placeholder="例如：The Boss">
+      </div>
+      <div class="form-group">
+        <label>价格 (USD) *</label>
+        <input type="number" id="edit-price" step="0.01" min="0" placeholder="89.99">
+      </div>
+      <div class="form-group">
+        <label>标签（用英文逗号分隔）</label>
+        <input type="text" id="edit-tags" placeholder="Top Pick, New, Dragon">
+      </div>
+      <div class="form-group">
+        <label>描述</label>
+        <textarea id="edit-description" placeholder="商品描述..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>图片路径（相对路径，一般不用改）</label>
+        <input type="text" id="edit-image" placeholder="images/xxx.jpg">
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeModal()">取消</button>
+        <button class="btn" onclick="saveProduct()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/app.js"></script>
+  <script>
+    let isAdding = false;
+
+    async function initAdmin() {
+      await loadProducts();
+      renderAdminTable();
+    }
+
+    function renderAdminTable() {
+      const tbody = document.getElementById('admin-product-list');
+      if (!products || products.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#8b949e;">暂无商品</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = products.map(p => `
+        <tr>
+          <td><img src="../${p.image}" alt="" style="width:48px;height:64px;object-fit:cover;border-radius:4px;" onerror="this.style.opacity=0.3"></td>
+          <td>
+            <div style="font-weight:600;">${escapeHtml(p.name)}</div>
+            <div style="font-size:0.8rem;color:#8b949e;">${escapeHtml(p.subtitle || '')}</div>
+          </td>
+          <td>$${Number(p.price).toFixed(2)}</td>
+          <td><span class="badge badge-success">有库存</span></td>
+          <td>${(p.tags || []).map(t => `<span class="badge" style="background:rgba(255,20,147,0.15);color:#ff1493;margin-right:4px;">${escapeHtml(t)}</span>`).join('')}</td>
+          <td>
+            <button style="background:none;border:1px solid #30363d;color:#e5e7eb;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:0.8rem;margin-right:6px;" onclick="openEditModal('${p.id}')">编辑</button>
+            <button style="background:none;border:1px solid #30363d;color:#f87171;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:0.8rem;" onclick="deleteProduct('${p.id}')">删除</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function openEditModal(id) {
+      isAdding = false;
+      const p = products.find(item => item.id === id);
+      if (!p) return;
+
+      document.getElementById('modal-title').textContent = '编辑商品';
+      document.getElementById('edit-id').value = p.id;
+      document.getElementById('edit-name').value = p.name || '';
+      document.getElementById('edit-subtitle').value = p.subtitle || '';
+      document.getElementById('edit-price').value = p.price || '';
+      document.getElementById('edit-tags').value = (p.tags || []).join(', ');
+      document.getElementById('edit-description').value = p.description || '';
+      document.getElementById('edit-image').value = p.image || '';
+
+      document.getElementById('product-modal').classList.add('open');
+    }
+
+    function openAddModal() {
+      isAdding = true;
+      document.getElementById('modal-title').textContent = '新增商品';
+      document.getElementById('edit-id').value = '';
+      document.getElementById('edit-name').value = '';
+      document.getElementById('edit-subtitle').value = '';
+      document.getElementById('edit-price').value = '';
+      document.getElementById('edit-tags').value = '';
+      document.getElementById('edit-description').value = '';
+      document.getElementById('edit-image').value = 'images/of5Dd.jpg';
+
+      document.getElementById('product-modal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('product-modal').classList.remove('open');
+    }
+
+    function saveProduct() {
+      const name = document.getElementById('edit-name').value.trim();
+      const price = parseFloat(document.getElementById('edit-price').value);
+
+      if (!name) {
+        alert('请填写商品名称');
+        return;
+      }
+      if (isNaN(price) || price < 0) {
+        alert('请填写正确的价格');
+        return;
+      }
+
+      const subtitle = document.getElementById('edit-subtitle').value.trim();
+      const tagsStr = document.getElementById('edit-tags').value.trim();
+      const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(Boolean) : [];
+      const description = document.getElementById('edit-description').value.trim();
+      const image = document.getElementById('edit-image').value.trim() || 'images/of5Dd.jpg';
+
+      if (isAdding) {
+        // Generate a simple id
+        const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Date.now().toString(36).slice(-4);
+        products.push({
+          id,
+          name,
+          subtitle,
+          price,
+          fromPrice: true,
+          image,
+          category: 'dildos',
+          tags,
+          firmness: ['Soft', 'Medium', 'Firm'],
+          sizes: ['S', 'M', 'L'],
+          description,
+          features: ['100% Platinum Silicone', 'Body Safe', 'Custom Colors', 'Discreet Shipping'],
+          awards: null
+        });
+      } else {
+        const id = document.getElementById('edit-id').value;
+        const idx = products.findIndex(p => p.id === id);
+        if (idx === -1) return;
+
+        products[idx] = {
+          ...products[idx],
+          name,
+          subtitle,
+          price,
+          tags,
+          description,
+          image
+        };
+      }
+
+      saveProductsToStorage();
+      renderAdminTable();
+      closeModal();
+      alert(isAdding ? '新增成功！请刷新前台页面查看。' : '保存成功！请刷新前台页面查看。');
+    }
+
+    function deleteProduct(id) {
+      const p = products.find(item => item.id === id);
+      if (!p) return;
+
+      if (!confirm(`确定要删除「${p.name}」吗？此操作不可恢复（除非清除本地缓存）。`)) {
+        return;
+      }
+
+      products = products.filter(item => item.id !== id);
+      saveProductsToStorage();
+      renderAdminTable();
+      alert('已删除。请刷新前台页面查看。');
+    }
+
+    // Close modal when clicking overlay
+    document.getElementById('product-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    initAdmin();
+  </script>
+</body>
+</html>

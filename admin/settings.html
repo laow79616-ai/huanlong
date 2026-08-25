@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系统设置 – Nothosaur 后台</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .settings-card {
+      background: #161b22; border: 1px solid #30363d; border-radius: 10px;
+      padding: 24px; margin-bottom: 20px; max-width: 640px;
+    }
+    .settings-card h3 { font-size: 1rem; margin-bottom: 18px; color: #ff1493; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block; font-size: 0.8rem; color: #8b949e; margin-bottom: 6px; font-weight: 600;
+    }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; padding: 10px 12px; background: #0d1117; border: 1px solid #30363d;
+      border-radius: 6px; color: #e6edf3; font-size: 0.95rem; font-family: inherit;
+    }
+    .form-group input:focus { outline: none; border-color: #ff1493; }
+    .form-group input[type="file"] {
+      padding: 8px; background: #0d1117; border: 1px dashed #30363d;
+    }
+    .hint { font-size: 0.78rem; color: #6e7681; margin-top: 4px; }
+    .qr-preview {
+      margin-top: 12px; padding: 16px; background: #0d1117; border: 1px dashed #30363d;
+      border-radius: 8px; text-align: center; display: none;
+    }
+    .qr-preview img {
+      max-width: 200px; max-height: 200px; border-radius: 8px; background: #fff; padding: 8px;
+    }
+  </style>
+<script>
+(function(){
+  if (sessionStorage.getItem('nothosaur_admin_session') !== '1') {
+    location.href = 'login.html';
+  }
+})();
+</script>
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="logo" style="color:#ff1493;font-weight:700;font-size:1.1rem;padding:0 20px 22px;border-bottom:1px solid #30363d;margin-bottom:14px;">
+        NOTHOSAUR 后台
+      </div>
+      <nav class="admin-nav">
+        <a href="index.html">仪表盘</a>
+        <a href="products.html">商品管理</a>
+        <a href="orders.html">订单管理</a>
+        <a href="members.html">会员列表</a>
+        <a href="inquiries.html">客户咨询</a>
+        <a href="content.html">内容发布</a>
+        <a href="stats.html">数据统计</a>
+        <a href="settings.html" class="active">系统设置</a>
+        <a href="../index.html" style="margin-top:24px;color:#ff1493;">← 返回前台</a>
+        <a href="login.html" onclick="sessionStorage.removeItem('nothosaur_admin_session')" style="color:#f87171;">退出登录</a>
+      </nav>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-header">
+        <h1>系统设置</h1>
+      </div>
+
+      <div class="settings-card">
+        <h3>网站基本信息</h3>
+        <div class="form-group">
+          <label>网站名称</label>
+          <input type="text" id="site-name" value="Nothosaur">
+        </div>
+        <div class="form-group">
+          <label>网站标语</label>
+          <input type="text" id="site-slogan" value="Make toys unique. Make sex free.">
+        </div>
+        <div class="form-group">
+          <label>客服邮箱</label>
+          <input type="email" id="site-email" value="support@nothosaur.pw">
+        </div>
+        <div class="form-group">
+          <label>货币单位</label>
+          <select id="site-currency">
+            <option value="USD" selected>USD ($)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="MYR">MYR (RM)</option>
+            <option value="CNY">CNY (¥)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h3>收款方式 – imToken</h3>
+        <div class="form-group">
+          <label>imToken 钱包地址</label>
+          <input type="text" id="imtoken-address" placeholder="例如：0x1234...abcd">
+          <div class="hint">用户付款时显示此地址，请仔细核对</div>
+        </div>
+        <div class="form-group">
+          <label>收款网络</label>
+          <select id="imtoken-network">
+            <option value="ERC20">Ethereum (ERC20)</option>
+            <option value="TRC20">Tron (TRC20)</option>
+            <option value="BEP20">BSC (BEP20)</option>
+            <option value="Polygon">Polygon</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>收款币种说明</label>
+          <input type="text" id="imtoken-coin" placeholder="例如：USDT (ERC20)" value="USDT">
+        </div>
+        <div class="form-group">
+          <label>付款备注提示</label>
+          <input type="text" id="imtoken-note" value="Please include your order number in the memo">
+        </div>
+
+        <div class="form-group">
+          <label>从本地选择收款二维码图片</label>
+          <input type="file" id="qr-file" accept="image/*" onchange="handleQrFile(event)">
+          <div class="hint">选择后自动预览并保存（建议正方形、清晰二维码）</div>
+        </div>
+
+        <div class="form-group">
+          <label>或填写二维码图片地址（URL）</label>
+          <input type="text" id="imtoken-qr" placeholder="https://... 或 /images/qr.png" oninput="previewQrFromUrl()">
+        </div>
+
+        <div class="qr-preview" id="qr-preview">
+          <div style="font-size:0.8rem;color:#8b949e;margin-bottom:8px;">二维码预览</div>
+          <img id="qr-img" src="" alt="收款二维码">
+        </div>
+
+        <button class="btn" style="padding:10px 22px;font-size:0.9rem;margin-top:16px;" onclick="saveSettings()">保存全部设置</button>
+      </div>
+
+      <div class="settings-card">
+        <h3>数据管理</h3>
+        <p style="color:#8b949e;font-size:0.9rem;margin-bottom:16px;">演示数据保存在浏览器 localStorage 中。</p>
+        <button class="btn" style="padding:10px 18px;font-size:0.88rem;background:#30363d;margin-right:10px;" onclick="resetProducts()">重置商品数据</button>
+        <button class="btn" style="padding:10px 18px;font-size:0.88rem;background:#30363d;margin-right:10px;" onclick="resetOrders()">重置订单数据</button>
+        <button class="btn" style="padding:10px 18px;font-size:0.88rem;background:#30363d;" onclick="resetMembers()">重置会员数据</button>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let qrDataUrl = '';
+
+    function loadSettings() {
+      const s = JSON.parse(localStorage.getItem('nothosaur_demo_settings') || '{}');
+      if (s.name) document.getElementById('site-name').value = s.name;
+      if (s.slogan) document.getElementById('site-slogan').value = s.slogan;
+      if (s.email) document.getElementById('site-email').value = s.email;
+      if (s.currency) document.getElementById('site-currency').value = s.currency;
+      if (s.imtokenAddress) document.getElementById('imtoken-address').value = s.imtokenAddress;
+      if (s.imtokenNetwork) document.getElementById('imtoken-network').value = s.imtokenNetwork;
+      if (s.imtokenCoin) document.getElementById('imtoken-coin').value = s.imtokenCoin;
+      if (s.imtokenNote) document.getElementById('imtoken-note').value = s.imtokenNote;
+      if (s.imtokenQr) {
+        document.getElementById('imtoken-qr').value = s.imtokenQr.startsWith('data:') ? '(本地图片已保存)' : s.imtokenQr;
+        qrDataUrl = s.imtokenQr.startsWith('data:') ? s.imtokenQr : '';
+        showQr(s.imtokenQr);
+      }
+    }
+
+    function showQr(src) {
+      if (!src) {
+        document.getElementById('qr-preview').style.display = 'none';
+        return;
+      }
+      document.getElementById('qr-img').src = src;
+      document.getElementById('qr-preview').style.display = 'block';
+    }
+
+    function handleQrFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        alert('请选择图片文件');
+        return;
+      }
+      if (file.size > 1.5 * 1024 * 1024) {
+        alert('二维码图片请控制在 1.5MB 以内');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        qrDataUrl = ev.target.result;
+        document.getElementById('imtoken-qr').value = '(本地图片已加载，请点保存)';
+        showQr(qrDataUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function previewQrFromUrl() {
+      const url = document.getElementById('imtoken-qr').value.trim();
+      if (url && !url.includes('本地图片')) {
+        qrDataUrl = '';
+        showQr(url);
+      }
+    }
+
+    function saveSettings() {
+      let qr = document.getElementById('imtoken-qr').value.trim();
+      if (qrDataUrl) qr = qrDataUrl;
+      if (qr.includes('本地图片')) qr = qrDataUrl || '';
+
+      const data = {
+        name: document.getElementById('site-name').value.trim(),
+        slogan: document.getElementById('site-slogan').value.trim(),
+        email: document.getElementById('site-email').value.trim(),
+        currency: document.getElementById('site-currency').value,
+        imtokenAddress: document.getElementById('imtoken-address').value.trim(),
+        imtokenNetwork: document.getElementById('imtoken-network').value,
+        imtokenCoin: document.getElementById('imtoken-coin').value.trim(),
+        imtokenNote: document.getElementById('imtoken-note').value.trim(),
+        imtokenQr: qr
+      };
+      localStorage.setItem('nothosaur_demo_settings', JSON.stringify(data));
+      alert('设置已保存！');
+    }
+
+    function resetProducts() {
+      if (!confirm('确定重置商品数据？')) return;
+      localStorage.removeItem('nothosaur_demo_products');
+      alert('已重置');
+    }
+    function resetOrders() {
+      if (!confirm('确定清空订单？')) return;
+      localStorage.removeItem('nothosaur_demo_orders');
+      alert('已重置');
+    }
+    function resetMembers() {
+      if (!confirm('确定清空会员？')) return;
+      localStorage.removeItem('nothosaur_demo_members');
+      alert('已重置');
+    }
+
+    loadSettings();
+  </script>
+</body>
+</html>

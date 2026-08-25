@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nothosaur Demo – Fantasy Silicone Designs</title>
+  <meta name="description" content="Handcrafted platinum silicone fantasy designs. Make toys unique. Make sex free.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 4 C12 8 6 16 8 26 C10 32 16 36 20 36 C24 36 30 32 32 26 C34 16 28 8 20 4 Z" fill="#ff1493"/>
+          <path d="M14 18 Q20 12 26 18" stroke="#0a0a0a" stroke-width="2" fill="none"/>
+          <circle cx="15" cy="20" r="1.5" fill="#0a0a0a"/>
+          <circle cx="25" cy="20" r="1.5" fill="#0a0a0a"/>
+        </svg>
+        <span>NOTHOSAUR</span>
+      </a>
+
+      <nav class="nav">
+        <a href="collections.html">Shop All</a>
+        <a href="community.html">Community</a>
+        <a href="collections.html">Dildos</a>
+        <a href="collections.html">New Releases</a>
+        <a href="collections.html">Available Now</a>
+        <a href="#">Info & Rewards</a>
+      </nav>
+
+      <div class="header-actions">
+        <button title="Search" aria-label="Search">🔍</button>
+        <button title="Account" onclick="location.href=(localStorage.getItem('nothosaur_demo_session')? 'account.html':'login.html')"  aria-label="Account">👤</button>
+        <button onclick="openCart()" title="Cart" aria-label="Cart">
+          🛒 <span class="cart-count" style="display:none">0</span>
+        </button>
+        <button class="menu-toggle" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
+      </div>
+    </div>
+    <div class="mobile-nav" id="mobile-nav">
+      <a href="collections.html">Shop All</a>
+        <a href="community.html">Community</a>
+      <a href="collections.html">Dildos</a>
+      <a href="collections.html">New Releases</a>
+      <a href="collections.html">Available Now</a>
+      <a href="#">Info & Rewards</a>
+      <a href="admin/index.html" style="color:#ff1493">Admin Panel</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <h1 class="hero-title">Ignis</h1>
+      <p class="hero-sub">— The Boss —</p>
+      <p class="hero-desc">
+        Handcrafted platinum silicone. Fantasy made personal. Custom colors & firmness available.
+      </p>
+      <a href="product.html?id=ignis" class="btn">Shop Now</a>
+    </div>
+  </section>
+
+  <!-- Top Picks -->
+  <section class="section">
+    <div class="section-header">
+      <h2 class="section-title">Top <span>Picks</span></h2>
+      <a href="collections.html" class="section-link">View all →</a>
+    </div>
+    <div class="product-grid" id="home-products">
+      <!-- filled by JS -->
+    </div>
+
+    <!-- Trust -->
+    <div class="trust-row">
+      <div class="trust-item">
+        <div class="icon">📦</div>
+        <h4>Discreet Shipping</h4>
+        <p>Plain packaging worldwide. Privacy guaranteed.</p>
+      </div>
+      <div class="trust-item">
+        <div class="icon">🛡️</div>
+        <h4>Body Safe</h4>
+        <p>100% platinum silicone. Hypoallergenic & non-porous.</p>
+      </div>
+      <div class="trust-item">
+        <div class="icon">🎨</div>
+        <h4>Custom Colors</h4>
+        <p>Every piece hand-poured. Choose your own scheme.</p>
+      </div>
+      <div class="trust-item">
+        <div class="icon">💬</div>
+        <h4>Support</h4>
+        <p>Fast, friendly help via chat & email.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Worldview teaser -->
+  <section class="section" style="text-align:center;padding-top:12px;padding-bottom:48px;">
+    <h2 class="section-title" style="margin-bottom:14px;">Welcome to <span>Nothosaur Mainland</span></h2>
+    <p style="color:var(--text-muted);max-width:520px;margin:0 auto 28px;font-size:0.98rem;">
+      A fantasy world between dreams and the fourth realm. Every creature has a story. Every piece is unique.
+    </p>
+    <a href="collections.html" class="btn btn-outline">Explore the Collection</a>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <h4>Shop</h4>
+        <a href="collections.html">All Products</a>
+        <a href="collections.html">New Releases</a>
+        <a href="collections.html">Best Sellers</a>
+      </div>
+      <div>
+        <h4>Info</h4>
+        <a href="#">Material & Care</a>
+        <a href="#">Shipping</a>
+        <a href="#">Size Guide</a>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <a href="#">Contact</a>
+        <a href="#">FAQ</a>
+        <a href="#">Returns Policy</a>
+      </div>
+      <div>
+        <h4>Demo</h4>
+        <a href="admin/index.html">Admin Backend (中文)</a>
+        <a href="#">Static framework preview</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2026 Framework Demo · For demonstration purposes only · Not affiliated with the original brand
+    </div>
+  </footer>
+
+  <!-- Cart Drawer -->
+  <div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+  <div class="cart-drawer" id="cart-drawer">
+    <div class="cart-header">
+      <h3>Your Cart</h3>
+      <button onclick="closeCart()" style="background:none;border:none;color:#fff;font-size:1.4rem;cursor:pointer;line-height:1;">×</button>
+    </div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span>Total</span>
+        <span id="cart-total-price">$0.00</span>
+      </div>
+      <button class="btn" style="width:100%;" onclick="alert('This is a demo. Checkout is not connected.')">Checkout</button>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

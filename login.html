@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In – Nothosaur</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .auth-wrap { max-width: 420px; margin: 40px auto; padding: 0 16px 60px; }
+    .auth-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 28px 22px;
+    }
+    .auth-card h1 { font-size: 1.4rem; margin-bottom: 6px; text-align: center; }
+    .auth-card .sub {
+      text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;
+    }
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+      display: block; font-size: 0.78rem; color: var(--text-muted);
+      margin-bottom: 6px; font-weight: 600;
+    }
+    .form-group input {
+      width: 100%; padding: 12px 14px; background: #0d0d0d; border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-size: 0.95rem; font-family: inherit;
+      box-sizing: border-box;
+    }
+    .form-group input:focus { outline: none; border-color: var(--pink); }
+    .auth-footer {
+      text-align: center; margin-top: 18px; font-size: 0.9rem; color: var(--text-muted);
+    }
+    .auth-footer a { color: var(--pink); font-weight: 600; }
+    .error {
+      background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.35);
+      color: #f87171; padding: 10px 12px; border-radius: 8px; font-size: 0.88rem;
+      margin-bottom: 14px; display: none;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <svg viewBox="0 0 40 40" fill="none"><path d="M20 4 C12 8 6 16 8 26 C10 32 16 36 20 36 C24 36 30 32 32 26 C34 16 28 8 20 4 Z" fill="#ff1493"/></svg>
+        <span>NOTHOSAUR</span>
+      </a>
+    </div>
+  </header>
+
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <h1>Sign In</h1>
+      <div class="sub">Welcome back</div>
+      <div class="error" id="error"></div>
+      <div class="form-group">
+        <label>Email *</label>
+        <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Password *</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn" style="width:100%;margin-top:8px;" onclick="doLogin()">Sign In</button>
+      <div class="auth-footer">
+        Don't have an account? <a href="register.html">Register</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const USERS_KEY = 'nothosaur_demo_users';
+    const SESSION_KEY = 'nothosaur_demo_session';
+
+    function getUsers() {
+      try { return JSON.parse(localStorage.getItem(USERS_KEY) || '[]'); }
+      catch(e) { return []; }
+    }
+    function showError(msg) {
+      const el = document.getElementById('error');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function doLogin() {
+      const email = document.getElementById('email').value.trim().toLowerCase();
+      const password = document.getElementById('password').value;
+      if (!email || !password) return showError('Please enter email and password');
+
+      const user = getUsers().find(u => u.email === email && u.password === password);
+      if (!user) return showError('Invalid email or password');
+
+      localStorage.setItem(SESSION_KEY, JSON.stringify({
+        id: user.id, name: user.name, email: user.email
+      }));
+      location.href = 'account.html';
+    }
+
+    // already logged in?
+    try {
+      if (JSON.parse(localStorage.getItem(SESSION_KEY) || 'null')) {
+        location.href = 'account.html';
+      }
+    } catch(e) {}
+  </script>
+</body>
+</html>

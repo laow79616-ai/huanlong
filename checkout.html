@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout – Nothosaur</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .checkout-wrap { max-width: 520px; margin: 0 auto; padding: 20px 16px 60px; }
+    .checkout-wrap h1 { font-size: 1.4rem; margin-bottom: 8px; }
+    .section-title { font-size: 1rem; font-weight: 650; margin: 24px 0 12px; color: #ff1493; }
+    .order-summary, .addr-box, .pay-box {
+      background: #121212; border: 1px solid #252525; border-radius: 12px; padding: 16px; margin-bottom: 16px;
+    }
+    .order-line { display: flex; justify-content: space-between; padding: 8px 0; font-size: 0.92rem; border-bottom: 1px solid #252525; gap: 10px; }
+    .order-total { display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 700; margin-top: 10px; padding-top: 10px; border-top: 1px solid #252525; color: #ff1493; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 0.78rem; color: #9a9a9a; margin-bottom: 5px; font-weight: 600; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 11px 12px; background: #0d0d0d; border: 1px solid #252525;
+      border-radius: 8px; color: #f5f5f5; font-size: 0.95rem; font-family: inherit; box-sizing: border-box;
+    }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: #ff1493; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .saved-list { margin-bottom: 12px; }
+    .saved-item {
+      display: block; width: 100%; text-align: left; padding: 10px 12px; margin-bottom: 8px;
+      background: #0d0d0d; border: 1px solid #252525; border-radius: 8px; color: #e5e7eb;
+      font-size: 0.85rem; cursor: pointer;
+    }
+    .saved-item:hover, .saved-item.active { border-color: #ff1493; background: rgba(255,20,147,0.08); }
+    .pay-box { text-align: center; }
+    .pay-box h2 { font-size: 1.05rem; margin-bottom: 8px; color: #ff1493; }
+    .pay-box .network { font-size: 0.85rem; color: #9a9a9a; margin-bottom: 14px; }
+    .pay-box .address {
+      background: #0d0d0d; border: 1px solid #252525; border-radius: 8px; padding: 12px;
+      font-size: 0.8rem; word-break: break-all; font-family: monospace; color: #e5e7eb; flex: 1; margin: 0;
+    }
+    .addr-row { display: flex; gap: 8px; align-items: stretch; margin-bottom: 12px; }
+    .pay-box .qr { margin: 14px auto; max-width: 180px; background: #fff; padding: 8px; border-radius: 10px; display: none; }
+    .pay-box .qr img { width: 100%; display: block; }
+    .pay-box .note { font-size: 0.85rem; color: #9a9a9a; margin-top: 10px; line-height: 1.5; }
+    .copy-btn {
+      background: transparent; border: 1px solid #ff1493; color: #ff1493; padding: 0 14px;
+      border-radius: 8px; cursor: pointer; font-size: 0.85rem; white-space: nowrap;
+    }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; padding: 14px 28px;
+      background: #ff1493; color: #fff; font-weight: 700; font-size: 0.88rem; border: none;
+      border-radius: 10px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; min-height: 48px;
+    }
+  </style>
+</head>
+<body style="background:#0a0a0a;color:#f5f5f5;font-family:system-ui,sans-serif;margin:0;">
+  <header style="padding:14px 16px;border-bottom:1px solid #252525;">
+    <a href="index.html" style="color:#ff1493;font-weight:700;text-decoration:none;font-size:1.1rem;">NOTHOSAUR</a>
+    <a href="collections.html" style="float:right;color:#9a9a9a;font-size:0.9rem;text-decoration:none;">← Continue shopping</a>
+  </header>
+
+  <div class="checkout-wrap">
+    <h1>Checkout</h1>
+
+    <div class="section-title">Order Summary</div>
+    <div class="order-summary" id="order-summary">
+      <div style="text-align:center;padding:16px;color:#9a9a9a;">Loading...</div>
+    </div>
+
+    <div class="section-title">Shipping Address</div>
+    <div class="addr-box">
+      <div class="saved-list" id="saved-list"></div>
+      <div class="form-group">
+        <label>Country / Region *</label>
+        <select id="addr-country">
+          <option value="">Select country</option>
+          <option value="Malaysia">Malaysia</option>
+          <option value="Singapore">Singapore</option>
+          <option value="United States">United States</option>
+          <option value="United Kingdom">United Kingdom</option>
+          <option value="Australia">Australia</option>
+          <option value="Canada">Canada</option>
+          <option value="Germany">Germany</option>
+          <option value="France">France</option>
+          <option value="Japan">Japan</option>
+          <option value="South Korea">South Korea</option>
+          <option value="Thailand">Thailand</option>
+          <option value="Indonesia">Indonesia</option>
+          <option value="Philippines">Philippines</option>
+          <option value="Vietnam">Vietnam</option>
+          <option value="China">China</option>
+          <option value="Hong Kong">Hong Kong</option>
+          <option value="Taiwan">Taiwan</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>City *</label>
+          <input type="text" id="addr-city" placeholder="City">
+        </div>
+        <div class="form-group">
+          <label>State / Province / Region</label>
+          <input type="text" id="addr-region" placeholder="State / Region">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Street Address *</label>
+        <input type="text" id="addr-street" placeholder="Street, building, apartment">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Recipient Name *</label>
+          <input type="text" id="addr-name" placeholder="Full name">
+        </div>
+        <div class="form-group">
+          <label>Phone *</label>
+          <input type="tel" id="addr-phone" placeholder="+60 12-345 6789">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Postal Code *</label>
+        <input type="text" id="addr-postal" placeholder="Postal / ZIP code">
+      </div>
+    </div>
+
+    <div class="section-title">Payment</div>
+    <div class="pay-box" id="pay-box">
+      <h2>Pay with imToken</h2>
+      <div class="network" id="pay-network">Loading...</div>
+      <div class="addr-row">
+        <div class="address" id="pay-address">—</div>
+        <button class="copy-btn" onclick="copyAddress()">复制</button>
+      </div>
+      <div class="qr" id="pay-qr"><img id="pay-qr-img" src="" alt="QR"></div>
+      <div class="note" id="pay-note"></div>
+      <div class="note" style="margin-top:12px;">After payment, keep your transaction hash.</div>
+      <button class="btn" style="width:100%;margin-top:18px;" onclick="confirmOrder()">I Have Paid</button>
+    </div>
+  </div>
+
+  <script>
+    const CART_KEY = 'nothosaur_demo_cart';
+    const PRODUCTS_KEY = 'nothosaur_demo_products';
+    const ADDR_KEY = 'nothosaur_demo_addresses';
+    let products = [];
+
+    async function loadProducts() {
+      const saved = localStorage.getItem(PRODUCTS_KEY);
+      if (saved) { try { products = JSON.parse(saved); return; } catch(e) {} }
+      try { const res = await fetch('js/products.json'); products = await res.json(); } catch(e) { products = []; }
+    }
+    function findProduct(id) { return products.find(p => p.id === id) || {}; }
+
+    function getAddresses() {
+      try { return JSON.parse(localStorage.getItem(ADDR_KEY) || '[]'); } catch(e) { return []; }
+    }
+    function saveAddresses(list) {
+      localStorage.setItem(ADDR_KEY, JSON.stringify(list));
+    }
+
+    function renderSavedAddresses() {
+      const list = getAddresses();
+      const el = document.getElementById('saved-list');
+      if (!list.length) { el.innerHTML = ''; return; }
+      el.innerHTML = '<div style="font-size:0.78rem;color:#9a9a9a;margin-bottom:8px;">Saved addresses (tap to fill)</div>' +
+        list.map((a, i) => `
+          <button type="button" class="saved-item" onclick="fillAddress(${i})">
+            ${a.name} · ${a.phone}<br>
+            <span style="color:#9a9a9a;">${a.street}, ${a.city}, ${a.region || ''} ${a.postal}, ${a.country}</span>
+          </button>
+        `).join('');
+    }
+
+    function fillAddress(index) {
+      const a = getAddresses()[index];
+      if (!a) return;
+      document.getElementById('addr-country').value = a.country || '';
+      document.getElementById('addr-city').value = a.city || '';
+      document.getElementById('addr-region').value = a.region || '';
+      document.getElementById('addr-street').value = a.street || '';
+      document.getElementById('addr-name').value = a.name || '';
+      document.getElementById('addr-phone').value = a.phone || '';
+      document.getElementById('addr-postal').value = a.postal || '';
+    }
+
+    function readAddressForm() {
+      return {
+        country: document.getElementById('addr-country').value.trim(),
+        city: document.getElementById('addr-city').value.trim(),
+        region: document.getElementById('addr-region').value.trim(),
+        street: document.getElementById('addr-street').value.trim(),
+        name: document.getElementById('addr-name').value.trim(),
+        phone: document.getElementById('addr-phone').value.trim(),
+        postal: document.getElementById('addr-postal').value.trim()
+      };
+    }
+
+    function validateAddress(a) {
+      if (!a.country) return 'Please select country';
+      if (!a.city) return 'Please enter city';
+      if (!a.street) return 'Please enter street address';
+      if (!a.name) return 'Please enter recipient name';
+      if (!a.phone) return 'Please enter phone number';
+      if (!a.postal) return 'Please enter postal code';
+      return '';
+    }
+
+    async function loadCheckout() {
+      await loadProducts();
+      renderSavedAddresses();
+      const cartItems = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+      const box = document.getElementById('order-summary');
+      if (!cartItems.length) {
+        box.innerHTML = '<div style="text-align:center;padding:24px;color:#9a9a9a;">Cart is empty. <a href="collections.html" style="color:#ff1493;">Go shopping</a></div>';
+        document.getElementById('pay-box').style.display = 'none';
+        return;
+      }
+      let total = 0, html = '';
+      cartItems.forEach(item => {
+        const p = findProduct(item.id);
+        const price = Number(p.price || 0), qty = item.qty || 1, sub = price * qty;
+        total += sub;
+        const meta = [item.size, item.firmness].filter(Boolean).join(' / ');
+        html += '<div class="order-line"><span>' + (p.name || item.id) + (meta ? ' (' + meta + ')' : '') + ' × ' + qty + '</span><span>$' + sub.toFixed(2) + '</span></div>';
+      });
+      html += '<div class="order-total"><span>Total</span><span>$' + total.toFixed(2) + '</span></div>';
+      box.innerHTML = html;
+
+      const s = JSON.parse(localStorage.getItem('nothosaur_demo_settings') || '{}');
+      document.getElementById('pay-network').textContent = (s.imtokenCoin || 'USDT') + ' · ' + (s.imtokenNetwork || 'ERC20');
+      document.getElementById('pay-address').textContent = s.imtokenAddress || 'Please set wallet address in Admin → Settings';
+      document.getElementById('pay-note').textContent = s.imtokenNote || 'Please include your order number in the memo';
+      if (s.imtokenQr) {
+        document.getElementById('pay-qr-img').src = s.imtokenQr;
+        document.getElementById('pay-qr').style.display = 'block';
+      }
+    }
+
+    function copyAddress() {
+      const addr = document.getElementById('pay-address').textContent;
+      if (!addr || addr.includes('Please set')) return;
+      navigator.clipboard.writeText(addr).then(function(){ alert('Address copied!'); }).catch(function(){ prompt('Copy:', addr); });
+    }
+
+    function confirmOrder() {
+      const addr = readAddressForm();
+      const err = validateAddress(addr);
+      if (err) { alert(err); return; }
+
+      const cartItems = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+      if (!cartItems.length) return;
+
+      // 保存到地址库（去重：同名+电话+邮编）
+      let addrs = getAddresses();
+      const exists = addrs.some(a => a.name === addr.name && a.phone === addr.phone && a.postal === addr.postal);
+      if (!exists) {
+        addrs.unshift(addr);
+        if (addrs.length > 10) addrs = addrs.slice(0, 10);
+        saveAddresses(addrs);
+      }
+
+      let total = 0, names = [];
+      cartItems.forEach(function(item) {
+        const p = findProduct(item.id);
+        total += Number(p.price || 0) * (item.qty || 1);
+        names.push((p.name || item.id) + ' ×' + (item.qty || 1));
+      });
+
+      const orders = JSON.parse(localStorage.getItem('nothosaur_demo_orders') || '[]');
+      const now = new Date();
+      const id = 'NS-' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '-' + String(Math.floor(Math.random()*90)+10);
+
+      orders.unshift({
+        id: id,
+        customer: addr.name,
+        product: names.join(', '),
+        amount: total,
+        status: 'pending',
+        time: now.toISOString().slice(0, 16).replace('T', ' '),
+        shipping: addr
+      });
+      localStorage.setItem('nothosaur_demo_orders', JSON.stringify(orders));
+      localStorage.removeItem(CART_KEY);
+      alert('Thank you! Order ' + id + ' recorded.\\nShipping to: ' + addr.name + ', ' + addr.city + ', ' + addr.country);
+      location.href = 'index.html';
+    }
+
+    loadCheckout();
+  </script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>会员列表 – Nothosaur 后台</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script>
+  (function(){
+    if (sessionStorage.getItem('nothosaur_admin_session') !== '1') {
+      location.href = 'login.html';
+    }
+  })();
+  </script>
+  <style>
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 300;
+      display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #161b22; border: 1px solid #30363d; border-radius: 12px;
+      width: 100%; max-width: 420px; padding: 24px;
+    }
+    .modal h2 { font-size: 1.15rem; margin-bottom: 16px; color: #ff1493; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.8rem; color: #8b949e; margin-bottom: 6px; font-weight: 600; }
+    .form-group input {
+      width: 100%; padding: 10px 12px; background: #0d1117; border: 1px solid #30363d;
+      border-radius: 6px; color: #e6edf3; font-size: 0.95rem; box-sizing: border-box;
+    }
+  </style>
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="logo" style="color:#ff1493;font-weight:700;font-size:1.1rem;padding:0 20px 22px;border-bottom:1px solid #30363d;margin-bottom:14px;">
+        NOTHOSAUR 后台
+      </div>
+      <nav class="admin-nav">
+        <a href="index.html">仪表盘</a>
+        <a href="products.html">商品管理</a>
+        <a href="orders.html">订单管理</a>
+        <a href="members.html" class="active">会员列表</a>
+        <a href="inquiries.html">客户咨询</a>
+        <a href="content.html">内容发布</a>
+        <a href="stats.html">数据统计</a>
+        <a href="settings.html">系统设置</a>
+        <a href="../index.html" style="margin-top:24px;color:#ff1493;">← 返回前台</a>
+        <a href="login.html" onclick="sessionStorage.removeItem('nothosaur_admin_session')" style="color:#f87171;">退出登录</a>
+      </nav>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-header">
+        <h1>会员列表</h1>
+        <button class="btn" style="padding:10px 18px;font-size:0.88rem;" onclick="location.reload()">刷新</button>
+      </div>
+
+      <p style="color:#8b949e;font-size:0.88rem;margin-bottom:16px;">
+        前台注册用户 · 可重置登录密码
+      </p>
+
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>昵称</th>
+            <th>邮箱</th>
+            <th>订单数</th>
+            <th>累计消费</th>
+            <th>注册时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="members-list"></tbody>
+      </table>
+      <div style="margin-top:24px;font-size:0.85rem;color:#8b949e;">
+        共 <span id="member-count">0</span> 位会员
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="pwd-modal">
+    <div class="modal">
+      <h2>修改登录密码</h2>
+      <input type="hidden" id="pwd-user-id">
+      <div class="form-group">
+        <label>会员</label>
+        <input type="text" id="pwd-user-display" disabled>
+      </div>
+      <div class="form-group">
+        <label>新密码 *（至少 6 位）</label>
+        <input type="text" id="pwd-new" placeholder="输入新密码" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>确认新密码 *</label>
+        <input type="text" id="pwd-new2" placeholder="再输入一次" autocomplete="off">
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
+        <button style="padding:10px 16px;background:transparent;border:1px solid #30363d;color:#e6edf3;border-radius:6px;cursor:pointer;" onclick="closePwdModal()">取消</button>
+        <button class="btn" style="padding:10px 18px;" onclick="savePassword()">保存密码</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const USERS_KEY = 'nothosaur_demo_users';
+    const ORDERS_KEY = 'nothosaur_demo_orders';
+
+    function getUsers() {
+      try { return JSON.parse(localStorage.getItem(USERS_KEY) || '[]'); }
+      catch(e) { return []; }
+    }
+    function saveUsers(list) {
+      localStorage.setItem(USERS_KEY, JSON.stringify(list));
+    }
+    function getOrders() {
+      try { return JSON.parse(localStorage.getItem(ORDERS_KEY) || '[]'); }
+      catch(e) { return []; }
+    }
+
+    function renderMembers() {
+      const users = getUsers();
+      const orders = getOrders();
+      document.getElementById('member-count').textContent = users.length;
+
+      if (!users.length) {
+        document.getElementById('members-list').innerHTML =
+          '<tr><td colspan="7" style="text-align:center;padding:40px;color:#8b949e;">暂无注册会员</td></tr>';
+        return;
+      }
+
+      document.getElementById('members-list').innerHTML = users.map((u, i) => {
+        const userOrders = orders.filter(o =>
+          o.customer === u.name || (o.shipping && o.shipping.name === u.name)
+        );
+        const total = userOrders.reduce((s, o) => s + Number(o.amount || 0), 0);
+        const joined = u.createdAt ? u.createdAt.slice(0, 10) : '-';
+
+        return `
+          <tr>
+            <td style="font-size:0.75rem;">${u.id || (i + 1)}</td>
+            <td>${u.name || '-'}</td>
+            <td>${u.email || '-'}</td>
+            <td>${userOrders.length}</td>
+            <td>$${total.toFixed(2)}</td>
+            <td>${joined}</td>
+            <td style="white-space:nowrap;">
+              <button style="background:none;border:1px solid #30363d;color:#86efac;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:0.78rem;margin-right:4px;" onclick="openPwdModal('${u.id}')">改密码</button>
+              <button style="background:none;border:1px solid #30363d;color:#f87171;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:0.78rem;" onclick="deleteUser('${u.id}')">删除</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openPwdModal(id) {
+      const u = getUsers().find(x => x.id === id);
+      if (!u) return;
+      document.getElementById('pwd-user-id').value = id;
+      document.getElementById('pwd-user-display').value = (u.name || '') + ' · ' + (u.email || '');
+      document.getElementById('pwd-new').value = '';
+      document.getElementById('pwd-new2').value = '';
+      document.getElementById('pwd-modal').classList.add('open');
+    }
+
+    function closePwdModal() {
+      document.getElementById('pwd-modal').classList.remove('open');
+    }
+
+    function savePassword() {
+      const id = document.getElementById('pwd-user-id').value;
+      const p1 = document.getElementById('pwd-new').value;
+      const p2 = document.getElementById('pwd-new2').value;
+      if (p1.length < 6) { alert('密码至少 6 位'); return; }
+      if (p1 !== p2) { alert('两次密码不一致'); return; }
+
+      const users = getUsers();
+      const idx = users.findIndex(u => u.id === id);
+      if (idx < 0) return;
+      users[idx].password = p1;
+      saveUsers(users);
+      closePwdModal();
+      alert('密码已更新。请告知用户使用新密码登录。');
+    }
+
+    function deleteUser(id) {
+      if (!confirm('确定删除此会员？')) return;
+      saveUsers(getUsers().filter(u => u.id !== id));
+      renderMembers();
+    }
+
+    document.getElementById('pwd-modal').addEventListener('click', function(e) {
+      if (e.target === this) closePwdModal();
+    });
+
+    renderMembers();
+  </script>
+</body>
+</html>

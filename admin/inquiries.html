@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>客户咨询 – Nothosaur 后台</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .inquiry-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 0;
+      height: calc(100vh - 60px);
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #161b22;
+    }
+    .session-list {
+      border-right: 1px solid #30363d;
+      overflow-y: auto;
+      background: #0d1117;
+    }
+    .session-item {
+      padding: 14px 16px;
+      border-bottom: 1px solid #30363d;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .session-item:hover, .session-item.active {
+      background: rgba(255,20,147,0.08);
+    }
+    .session-item.active {
+      border-left: 3px solid #ff1493;
+    }
+    .session-item .prod {
+      font-weight: 600;
+      font-size: 0.92rem;
+      margin-bottom: 4px;
+    }
+    .session-item .preview {
+      font-size: 0.8rem;
+      color: #8b949e;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .session-item .time {
+      font-size: 0.72rem;
+      color: #6e7681;
+      margin-top: 4px;
+    }
+    .chat-panel {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .chat-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid #30363d;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .chat-header img {
+      width: 44px;
+      height: 56px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 18px;
+      background: #0d1117;
+    }
+    .msg {
+      margin-bottom: 16px;
+      max-width: 80%;
+    }
+    .msg.user { margin-right: auto; }
+    .msg.admin { margin-left: auto; text-align: right; }
+    .msg .bubble {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      text-align: left;
+    }
+    .msg.user .bubble {
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-bottom-left-radius: 4px;
+    }
+    .msg.admin .bubble {
+      background: rgba(255,20,147,0.15);
+      border: 1px solid rgba(255,20,147,0.35);
+      color: #ff6ec7;
+      border-bottom-right-radius: 4px;
+    }
+    .msg .zh {
+      margin-top: 6px;
+      padding: 8px 12px;
+      background: rgba(34,197,94,0.08);
+      border: 1px solid rgba(34,197,94,0.25);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: #86efac;
+      text-align: left;
+    }
+    .msg .meta {
+      font-size: 0.72rem;
+      color: #6e7681;
+      margin-top: 4px;
+    }
+    .reply-area {
+      padding: 14px 18px;
+      border-top: 1px solid #30363d;
+      background: #161b22;
+    }
+    .reply-area textarea {
+      width: 100%;
+      min-height: 70px;
+      padding: 10px 12px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      color: #e6edf3;
+      font-size: 0.95rem;
+      font-family: inherit;
+      resize: vertical;
+      margin-bottom: 10px;
+    }
+    .reply-area textarea:focus {
+      outline: none;
+      border-color: #ff1493;
+    }
+    .reply-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .empty-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #8b949e;
+      font-size: 0.95rem;
+    }
+    .badge-open {
+      background: rgba(234,179,8,0.15);
+      color: #eab308;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+  </style>
+<script>
+(function(){
+  if (sessionStorage.getItem('nothosaur_admin_session') !== '1') {
+    location.href = 'login.html';
+  }
+})();
+</script>
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="logo" style="color:#ff1493;font-weight:700;font-size:1.1rem;padding:0 20px 22px;border-bottom:1px solid #30363d;margin-bottom:14px;">
+        NOTHOSAUR 后台
+      </div>
+      <nav class="admin-nav">
+        <a href="index.html">仪表盘</a>
+        <a href="products.html">商品管理</a>
+        <a href="orders.html">订单管理</a>
+        <a href="members.html">会员列表</a>
+        <a href="inquiries.html" class="active">客户咨询</a>
+        <a href="stats.html">数据统计</a>
+        <a href="settings.html">系统设置</a>
+        <a href="../index.html" style="margin-top:24px;color:#ff1493;">← 返回前台</a>
+        <a href="login.html" onclick="sessionStorage.removeItem('nothosaur_admin_session')" style="color:#f87171;">退出登录</a>
+      </nav>
+    </aside>
+
+    <main class="admin-main" style="padding:20px 24px;">
+      <div class="admin-header" style="margin-bottom:16px;">
+        <h1>客户咨询</h1>
+        <div style="font-size:0.85rem;color:#8b949e;">用户英文消息自动译中文 · 回复自动译英文</div>
+      </div>
+
+      <div class="inquiry-layout">
+        <div class="session-list" id="session-list">
+          <div class="empty-state" style="padding:40px 16px;">暂无咨询</div>
+        </div>
+        <div class="chat-panel" id="chat-panel">
+          <div class="empty-state">请选择左侧会话</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const CHAT_KEY = 'nothosaur_demo_chats';
+    let currentSessionId = null;
+
+    function getAllChats() {
+      try {
+        return JSON.parse(localStorage.getItem(CHAT_KEY) || '[]');
+      } catch(e) { return []; }
+    }
+
+    function saveAllChats(list) {
+      localStorage.setItem(CHAT_KEY, JSON.stringify(list));
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // 免费翻译接口（MyMemory，无需 key）
+    async function translate(text, from, to) {
+      if (!text || !text.trim()) return '';
+      try {
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data && data.responseData && data.responseData.translatedText) {
+          return data.responseData.translatedText;
+        }
+      } catch(e) {
+        console.warn('Translation failed', e);
+      }
+      return '[翻译失败，请手动理解原文]';
+    }
+
+    function renderSessionList() {
+      const list = getAllChats();
+      const el = document.getElementById('session-list');
+      if (!list.length) {
+        el.innerHTML = '<div class="empty-state" style="padding:40px 16px;">暂无咨询<br><span style="font-size:0.8rem;">用户在商品页发消息后会出现在这里</span></div>';
+        return;
+      }
+      el.innerHTML = list.map(s => {
+        const last = s.messages[s.messages.length - 1];
+        const preview = last ? (last.from === 'user' ? last.text : '你: ' + last.text) : '';
+        return `
+          <div class="session-item ${s.sessionId === currentSessionId ? 'active' : ''}" onclick="openSession('${s.sessionId}')">
+            <div class="prod">${escapeHtml(s.productName || '通用咨询')} ${s.status === 'open' ? '<span class="badge-open">进行中</span>' : ''}</div>
+            <div class="preview">${escapeHtml(preview)}</div>
+            <div class="time">${s.updatedAt ? new Date(s.updatedAt).toLocaleString('zh-CN') : ''}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function openSession(sid) {
+      currentSessionId = sid;
+      renderSessionList();
+      const list = getAllChats();
+      const session = list.find(c => c.sessionId === sid);
+      if (!session) return;
+
+      const panel = document.getElementById('chat-panel');
+      panel.innerHTML = `
+        <div class="chat-header">
+          <img src="../${session.productImage || ''}" onerror="this.style.display='none'" alt="">
+          <div>
+            <div style="font-weight:600;">${escapeHtml(session.productName)}</div>
+            <div style="font-size:0.8rem;color:#8b949e;">$${Number(session.productPrice || 0).toFixed(2)} · 会话 ${sid.slice(-6)}</div>
+          </div>
+        </div>
+        <div class="chat-messages" id="msg-area"></div>
+        <div class="reply-area">
+          <textarea id="reply-text" placeholder="用中文输入回复内容..."></textarea>
+          <div class="reply-actions">
+            <button class="btn" style="padding:10px 20px;font-size:0.88rem;" onclick="sendAdminReply()">发送（自动译成英文）</button>
+            <span style="font-size:0.8rem;color:#8b949e;">用户将收到英文版本</span>
+          </div>
+        </div>
+      `;
+
+      const area = document.getElementById('msg-area');
+      area.innerHTML = '<div style="text-align:center;color:#8b949e;padding:20px;">加载翻译中...</div>';
+
+      let html = '';
+      for (const m of session.messages) {
+        if (m.from === 'user') {
+          let zh = m.zh || '';
+          if (!zh) {
+            zh = await translate(m.text, 'en', 'zh-CN');
+            m.zh = zh;
+          }
+          html += `
+            <div class="msg user">
+              <div class="bubble">${escapeHtml(m.text)}</div>
+              <div class="zh">中文：${escapeHtml(zh)}</div>
+              <div class="meta">客户 · ${m.time}</div>
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="msg admin">
+              <div class="bubble">${escapeHtml(m.textEn || m.text)}</div>
+              ${m.text ? `<div class="zh" style="background:rgba(255,20,147,0.08);border-color:rgba(255,20,147,0.25);color:#ff9ecf;">原文(中)：${escapeHtml(m.text)}</div>` : ''}
+              <div class="meta">客服 · ${m.time}</div>
+            </div>
+          `;
+        }
+      }
+      area.innerHTML = html || '<div class="empty-state">暂无消息</div>';
+      area.scrollTop = area.scrollHeight;
+
+      // 保存翻译结果
+      saveAllChats(list);
+    }
+
+    async function sendAdminReply() {
+      const text = document.getElementById('reply-text').value.trim();
+      if (!text || !currentSessionId) return;
+
+      const btn = event.target;
+      btn.disabled = true;
+      btn.textContent = '翻译并发送中...';
+
+      const textEn = await translate(text, 'zh-CN', 'en');
+
+      const list = getAllChats();
+      const session = list.find(c => c.sessionId === currentSessionId);
+      if (!session) return;
+
+      const now = new Date();
+      session.messages.push({
+        id: 'm' + Date.now(),
+        from: 'admin',
+        text: text,          // 中文原文
+        textEn: textEn,      // 英文给用户
+        time: now.toLocaleString('zh-CN', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' }),
+        ts: now.getTime()
+      });
+      session.updatedAt = now.toISOString();
+      saveAllChats(list);
+
+      document.getElementById('reply-text').value = '';
+      btn.disabled = false;
+      btn.textContent = '发送（自动译成英文）';
+      openSession(currentSessionId);
+    }
+
+    // 初始化 + 轮询
+    renderSessionList();
+    setInterval(renderSessionList, 5000);
+  </script>
+</body>
+</html>

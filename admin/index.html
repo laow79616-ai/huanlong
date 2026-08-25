@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>仪表盘 – Nothosaur 后台</title>
+  <link rel="stylesheet" href="../css/style.css">
+<script>
+(function(){
+  if (sessionStorage.getItem('nothosaur_admin_session') !== '1') {
+    location.href = 'login.html';
+  }
+})();
+</script>
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="logo" style="color:#ff1493;font-weight:700;font-size:1.1rem;padding:0 20px 22px;border-bottom:1px solid #30363d;margin-bottom:14px;">
+        NOTHOSAUR 后台
+      </div>
+      <nav class="admin-nav">
+        <a href="index.html" class="active">仪表盘</a>
+        <a href="products.html">商品管理</a>
+        <a href="orders.html">订单管理</a>
+        <a href="members.html">会员列表</a>
+        <a href="inquiries.html">客户咨询</a>
+        <a href="content.html">内容发布</a>
+        <a href="stats.html">数据统计</a>
+        <a href="settings.html">系统设置</a>
+        <a href="../index.html" style="margin-top:24px;color:#ff1493;">← 返回前台</a>
+        <a href="login.html" onclick="sessionStorage.removeItem('nothosaur_admin_session')" style="color:#f87171;">退出登录</a>
+      </nav>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-header">
+        <h1>仪表盘</h1>
+        <div style="font-size:0.9rem;color:#8b949e;">实时概览 · 演示数据</div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="label">今日订单</div>
+          <div class="value" id="stat-orders">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">今日销售额</div>
+          <div class="value" id="stat-sales">$0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">待发货</div>
+          <div class="value" id="stat-pending">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">会员总数</div>
+          <div class="value" id="stat-members">0</div>
+        </div>
+      </div>
+
+      <h2 style="font-size:1.15rem;margin:28px 0 16px;">最近订单</h2>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>订单号</th>
+            <th>客户</th>
+            <th>商品</th>
+            <th>金额</th>
+            <th>状态</th>
+            <th>时间</th>
+          </tr>
+        </thead>
+        <tbody id="recent-orders"></tbody>
+      </table>
+
+      <div style="margin-top:36px;padding:18px;background:#161b22;border-radius:10px;border:1px solid #30363d;font-size:0.88rem;color:#8b949e;">
+        <strong style="color:#ff1493;">提示：</strong> 订单、会员数据为本地模拟，可在对应页面新增/修改。商品数据支持真实编辑（localStorage）。
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // 模拟订单数据
+    const defaultOrders = [
+      { id: 'NS-20260825-01', customer: 'A***n', product: 'Ignis (M / Medium)', amount: 89.99, status: 'shipped', time: '14:22' },
+      { id: 'NS-20260825-02', customer: 'L***a', product: 'Alla (L / Soft)', amount: 79.99, status: 'pending', time: '13:05' },
+      { id: 'NS-20260824-18', customer: 'K***o', product: 'Necrons (XL / Firm)', amount: 99.99, status: 'shipped', time: '昨天' },
+      { id: 'NS-20260824-15', customer: 'M***s', product: 'Serpentis (M / Medium)', amount: 84.99, status: 'completed', time: '昨天' },
+      { id: 'NS-20260823-09', customer: 'R***y', product: 'Pyra (S / Soft) ×2', amount: 119.98, status: 'completed', time: '2天前' }
+    ];
+
+    const defaultMembers = [
+      { id: 1, name: 'Alex N.', email: 'a***@gmail.com', orders: 3, total: 269.97, joined: '2026-07-12' },
+      { id: 2, name: 'Lina K.', email: 'l***@outlook.com', orders: 1, total: 79.99, joined: '2026-08-01' },
+      { id: 3, name: 'Ken O.', email: 'k***@yahoo.com', orders: 2, total: 184.98, joined: '2026-06-20' },
+      { id: 4, name: 'Maya S.', email: 'm***@icloud.com', orders: 4, total: 359.96, joined: '2026-05-08' },
+      { id: 5, name: 'Ryan T.', email: 'r***@proton.me', orders: 2, total: 149.98, joined: '2026-08-15' }
+    ];
+
+    function getOrders() {
+      const saved = localStorage.getItem('nothosaur_demo_orders');
+      if (saved) return JSON.parse(saved);
+      localStorage.setItem('nothosaur_demo_orders', JSON.stringify(defaultOrders));
+      return defaultOrders;
+    }
+
+    function getMembers() {
+      const saved = localStorage.getItem('nothosaur_demo_members');
+      if (saved) return JSON.parse(saved);
+      localStorage.setItem('nothosaur_demo_members', JSON.stringify(defaultMembers));
+      return defaultMembers;
+    }
+
+    function statusBadge(s) {
+      if (s === 'pending') return '<span class="badge badge-warning">待发货</span>';
+      if (s === 'shipped') return '<span class="badge badge-success">已发货</span>';
+      if (s === 'completed') return '<span class="badge" style="background:rgba(59,130,246,0.15);color:#3b82f6;">已完成</span>';
+      if (s === 'cancelled') return '<span class="badge" style="background:rgba(239,68,68,0.15);color:#ef4444;">已取消</span>';
+      return s;
+    }
+
+    const orders = getOrders();
+    const members = getMembers();
+
+    document.getElementById('stat-orders').textContent = orders.filter(o => o.time.includes(':') || o.time === '今天').length || 2;
+    document.getElementById('stat-sales').textContent = '$' + orders.slice(0, 2).reduce((s, o) => s + o.amount, 0).toFixed(0);
+    document.getElementById('stat-pending').textContent = orders.filter(o => o.status === 'pending').length;
+    document.getElementById('stat-members').textContent = members.length;
+
+    document.getElementById('recent-orders').innerHTML = orders.slice(0, 5).map(o => `
+      <tr>
+        <td>#${o.id}</td>
+        <td>${o.customer}</td>
+        <td>${o.product}</td>
+        <td>$${o.amount.toFixed(2)}</td>
+        <td>${statusBadge(o.status)}</td>
+        <td>${o.time}</td>
+      </tr>
+    `).join('');
+  </script>
+</body>
+</html>

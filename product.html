@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product – Nothosaur Demo</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .inquiry-section {
+      margin-top: 32px;
+      padding: 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .inquiry-section h3 {
+      font-size: 1.05rem;
+      margin-bottom: 8px;
+      color: var(--pink);
+    }
+    .inquiry-section p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    .chat-box {
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      height: 280px;
+      overflow-y: auto;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .chat-msg {
+      margin-bottom: 12px;
+      max-width: 85%;
+    }
+    .chat-msg.user {
+      margin-left: auto;
+      text-align: right;
+    }
+    .chat-msg .bubble {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      line-height: 1.45;
+      text-align: left;
+    }
+    .chat-msg.user .bubble {
+      background: var(--pink);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .chat-msg.admin .bubble {
+      background: #1f1f1f;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-bottom-left-radius: 4px;
+    }
+    .chat-msg .meta {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .chat-input-row {
+      display: flex;
+      gap: 10px;
+    }
+    .chat-input-row input {
+      flex: 1;
+      padding: 12px 14px;
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+    .chat-input-row input:focus {
+      outline: none;
+      border-color: var(--pink);
+    }
+    .product-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,20,147,0.1);
+      border: 1px solid rgba(255,20,147,0.3);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-bottom: 14px;
+      font-size: 0.88rem;
+    }
+    .product-chip img {
+      width: 40px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <svg viewBox="0 0 40 40" fill="none"><path d="M20 4 C12 8 6 16 8 26 C10 32 16 36 20 36 C24 36 30 32 32 26 C34 16 28 8 20 4 Z" fill="#ff1493"/></svg>
+        <span>NOTHOSAUR</span>
+      </a>
+      <nav class="nav">
+        <a href="collections.html">Shop All</a>
+        <a href="collections.html">Dildos</a>
+        <a href="collections.html">New Releases</a>
+        <a href="collections.html">Available Now</a>
+        <a href="#">Info & Rewards</a>
+      </nav>
+      <div class="header-actions">
+        <button title="Search">🔍</button>
+        <button title="Account" onclick="location.href=(localStorage.getItem('nothosaur_demo_session')? 'account.html':'login.html')" >👤</button>
+        <button onclick="openCart()" title="Cart">🛒 <span class="cart-count" style="display:none">0</span></button>
+        <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
+      </div>
+    </div>
+    <div class="mobile-nav" id="mobile-nav">
+      <a href="index.html">Home</a>
+      <a href="collections.html">Shop All</a>
+      <a href="admin/index.html" style="color:#ff1493">Admin Panel</a>
+    </div>
+  </header>
+
+  <div class="product-detail">
+    <div class="detail-gallery">
+      <img id="detail-img" src="" alt="Product">
+    </div>
+    <div class="detail-info">
+      <h1 id="detail-name">Product Name</h1>
+      <p class="subtitle" id="detail-subtitle"></p>
+      <div class="detail-price" id="detail-price">From $0.00</div>
+
+      <div class="option-group">
+        <label>Size</label>
+        <div class="option-buttons" id="size-options"></div>
+      </div>
+
+      <div class="option-group">
+        <label>Firmness</label>
+        <div class="option-buttons" id="firmness-options"></div>
+      </div>
+
+      <p id="detail-desc" style="color:var(--text-muted);margin:20px 0;line-height:1.65;"></p>
+
+      <ul class="features-list" id="detail-features"></ul>
+
+      <div class="add-to-cart-row">
+        <input type="number" id="qty" class="qty-input" value="1" min="1" max="5">
+        <button class="btn" style="flex:1;" onclick="handleAddToCart()">Add to Cart</button>
+      </div>
+
+      <p style="margin-top:22px;font-size:0.85rem;color:var(--text-muted);">
+        🔒 Discreet shipping · 100% platinum silicone · Custom colors available on request
+      </p>
+
+      <!-- Inquiry Chat -->
+      <div class="inquiry-section">
+        <h3>Ask about this product</h3>
+        <p>Have questions about size, firmness, or custom colors? Chat with us.</p>
+        <div class="product-chip" id="inquiry-product-chip">
+          <img id="inquiry-prod-img" src="" alt="">
+          <div>
+            <div id="inquiry-prod-name" style="font-weight:600;"></div>
+            <div id="inquiry-prod-price" style="color:var(--pink);font-size:0.85rem;"></div>
+          </div>
+        </div>
+        <div class="chat-box" id="chat-box">
+          <div style="text-align:center;color:var(--text-muted);padding:40px 10px;font-size:0.9rem;">
+            No messages yet. Say hello!
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <input type="text" id="chat-input" placeholder="Type your question in English..." onkeydown="if(event.key==='Enter')sendUserMessage()">
+          <button class="btn" style="padding:12px 20px;" onclick="sendUserMessage()">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-bottom" style="border:none;margin:0;padding:24px 0;">
+      © 2026 Framework Demo · For demonstration purposes only
+    </div>
+  </footer>
+
+  <div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+  <div class="cart-drawer" id="cart-drawer">
+    <div class="cart-header">
+      <h3>Your Cart</h3>
+      <button onclick="closeCart()" style="background:none;border:none;color:#fff;font-size:1.4rem;cursor:pointer;">×</button>
+    </div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-footer">
+      <div class="cart-total"><span>Total</span><span id="cart-total-price">$0.00</span></div>
+      <button class="btn" style="width:100%;" onclick="alert('Demo only')">Checkout</button>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    const CHAT_KEY = 'nothosaur_demo_chats';
+
+    function getChatSessionId() {
+      let sid = localStorage.getItem('nothosaur_chat_sid');
+      if (!sid) {
+        sid = 'u' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        localStorage.setItem('nothosaur_chat_sid', sid);
+      }
+      return sid;
+    }
+
+    function getAllChats() {
+      try {
+        return JSON.parse(localStorage.getItem(CHAT_KEY) || '[]');
+      } catch(e) { return []; }
+    }
+
+    function saveAllChats(list) {
+      localStorage.setItem(CHAT_KEY, JSON.stringify(list));
+    }
+
+    function getMyMessages() {
+      const sid = getChatSessionId();
+      const all = getAllChats();
+      const session = all.find(c => c.sessionId === sid);
+      return session ? session.messages : [];
+    }
+
+    function renderChat() {
+      const box = document.getElementById('chat-box');
+      const msgs = getMyMessages();
+      if (!msgs.length) {
+        box.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:40px 10px;font-size:0.9rem;">No messages yet. Say hello!</div>';
+        return;
+      }
+      box.innerHTML = msgs.map(m => `
+        <div class="chat-msg ${m.from}">
+          <div class="bubble">${escapeHtml(m.text)}</div>
+          <div class="meta">${m.from === 'user' ? 'You' : 'Support'} · ${m.time}</div>
+        </div>
+      `).join('');
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function sendUserMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const p = window.currentProduct || {};
+      const sid = getChatSessionId();
+      const all = getAllChats();
+      let session = all.find(c => c.sessionId === sid);
+
+      const now = new Date();
+      const timeStr = now.toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+
+      const msg = {
+        id: 'm' + Date.now(),
+        from: 'user',
+        text: text,
+        time: timeStr,
+        ts: now.getTime()
+      };
+
+      if (!session) {
+        session = {
+          sessionId: sid,
+          productId: p.id || '',
+          productName: p.name || 'General',
+          productImage: p.image || '',
+          productPrice: p.price || 0,
+          createdAt: now.toISOString(),
+          updatedAt: now.toISOString(),
+          status: 'open',
+          messages: [msg]
+        };
+        all.unshift(session);
+      } else {
+        session.messages.push(msg);
+        session.updatedAt = now.toISOString();
+        session.productId = p.id || session.productId;
+        session.productName = p.name || session.productName;
+        session.productImage = p.image || session.productImage;
+        session.productPrice = p.price || session.productPrice;
+      }
+
+      saveAllChats(all);
+      input.value = '';
+      renderChat();
+    }
+
+    // After product detail renders, fill chip
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const p = window.currentProduct;
+        if (p) {
+          document.getElementById('inquiry-prod-img').src = p.image || '';
+          document.getElementById('inquiry-prod-name').textContent = p.name || '';
+          document.getElementById('inquiry-prod-price').textContent = 'From $' + Number(p.price || 0).toFixed(2);
+        }
+        renderChat();
+        // Poll for admin replies every 4s
+        setInterval(renderChat, 4000);
+      }, 300);
+    });
+  </script>
+</body>
+</html>
