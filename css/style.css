@@ -655,64 +655,59 @@ button { font-family: inherit; }
   }
 }
 
-/* Admin mobile sidebar toggle */
+/* Admin mobile toggle - large touch target */
 .admin-sidebar-toggle {
-  display: none;
-  position: fixed;
-  top: 12px;
-  left: 12px;
-  z-index: 400;
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
-  border: 1px solid #30363d;
-  background: #161b22;
-  color: #ff1493;
-  font-size: 1.2rem;
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
+  display: none !important;
+  position: fixed !important;
+  top: 10px !important;
+  left: 10px !important;
+  z-index: 400 !important;
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 14px !important;
+  border: 2px solid #ff1493 !important;
+  background: #161b22 !important;
+  color: #ff1493 !important;
+  font-size: 1.6rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 4px 16px rgba(255, 20, 147, 0.35) !important;
+  line-height: 1 !important;
+  padding: 0 !important;
 }
 .admin-sidebar-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.55);
   z-index: 350;
 }
 .admin-sidebar-overlay.open { display: block; }
-
 @media (max-width: 900px) {
-  .admin-sidebar-toggle { display: flex; }
-  .admin-layout { display: block; }
+  .admin-sidebar-toggle { display: flex !important; }
+  .admin-layout { display: block !important; }
   .admin-sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 240px;
-    max-width: 80vw;
-    z-index: 360;
-    transform: translateX(-105%);
-    transition: transform 0.25s ease;
-    overflow-y: auto;
-    box-shadow: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 260px !important;
+    max-width: 85vw !important;
+    z-index: 360 !important;
+    transform: translateX(-105%) !important;
+    transition: transform 0.25s ease !important;
+    overflow-y: auto !important;
   }
   .admin-sidebar.open {
-    transform: translateX(0);
-    box-shadow: 8px 0 24px rgba(0,0,0,0.4);
+    transform: translateX(0) !important;
+    box-shadow: 8px 0 28px rgba(0,0,0,0.45) !important;
   }
   .admin-main {
-    padding: 56px 14px 24px !important;
-    width: 100%;
-    max-width: 100%;
-  }
-  .admin-table {
-    display: block;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .form-card, .settings-card {
+    padding: 70px 14px 28px !important;
+    width: 100% !important;
     max-width: 100% !important;
   }
 }
+

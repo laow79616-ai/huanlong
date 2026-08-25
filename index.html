@@ -171,51 +171,42 @@
   <script src="js/app.js"></script>
 
 
+
+
+
+
 <script>
 (function(){
-  const POSTS_KEY = 'nothosaur_demo_posts';
-  function getPosts(){ try{return JSON.parse(localStorage.getItem(POSTS_KEY)||'[]');}catch(e){return[];} }
-  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   function mediaHtml(p){
-    var url = p.mediaUrl || '';
-    if(p.type === 'video'){
-      if(url.indexOf('youtube.com')>-1 || url.indexOf('youtu.be')>-1){
-        var vid = url;
-        if(vid.indexOf('watch?v=')>-1) vid = vid.split('watch?v=')[1].split('&')[0];
-        else if(vid.indexOf('youtu.be/')>-1) vid = vid.split('youtu.be/')[1].split('?')[0];
-        return '<div style="position:relative;padding-bottom:56.25%;height:0;background:#000;"><iframe src="https://www.youtube.com/embed/'+vid+'?rel=0" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div>';
+    var url=p.mediaUrl||'';
+    if(p.type==='video'){
+      if(url.indexOf('youtube')>-1||url.indexOf('youtu.be')>-1){
+        var vid=url;
+        if(vid.indexOf('watch?v=')>-1)vid=vid.split('watch?v=')[1].split('&')[0];
+        else if(vid.indexOf('youtu.be/')>-1)vid=vid.split('youtu.be/')[1].split('?')[0];
+        return '<div style="position:relative;padding-bottom:56.25%;height:0;"><iframe src="https://www.youtube.com/embed/'+vid+'?autoplay=1&mute=1&playsinline=1&rel=0" style="position:absolute;inset:0;width:100%;height:100%;border:0;" allow="autoplay" allowfullscreen></iframe></div>';
       }
-      return '<video src="'+esc(url)+'" controls playsinline preload="metadata" style="width:100%;max-height:360px;background:#000;display:block;"></video>';
+      return '<div style="width:100%;aspect-ratio:3/4;max-height:70vh;overflow:hidden;background:#000;"><video src="'+esc(url)+'" autoplay muted loop playsinline preload="auto" style="width:100%;height:100%;object-fit:cover;display:block;"></video></div>';
     }
-    return '<img src="'+esc(url)+'" style="width:100%;max-height:360px;object-fit:cover;display:block;" onerror="this.style.opacity=0.3">';
+    return '<img src="'+esc(url)+'" style="width:100%;max-height:360px;object-fit:cover;display:block;">';
   }
-  function renderHomeFeed(){
-    var el = document.getElementById('home-feed');
+  function render(){
+    var el=document.getElementById('home-feed');
     if(!el) return;
-    var posts = getPosts().filter(function(p){ return p.published !== false; }).slice(0, 4);
-    if(!posts.length){
-      el.innerHTML = '<div style="text-align:center;color:#9a9a9a;padding:24px;grid-column:1/-1;">No community posts yet. <a href="community.html" style="color:#ff1493;">Be the first</a></div>';
-      return;
-    }
-    el.style.display = 'flex';
-    el.style.flexDirection = 'column';
-    el.style.gap = '20px';
-    el.style.gridTemplateColumns = 'none';
-    el.innerHTML = posts.map(function(p){
-      var promo = '';
-      if(p.productId){
-        promo = '<a href="product.html?id='+esc(p.productId)+'" style="display:inline-block;margin-top:8px;color:#ff1493;font-size:0.88rem;font-weight:600;">Shop '+esc(p.productName||'product')+' →</a>';
-      }
-      return '<div class="product-card" style="overflow:hidden;">'+mediaHtml(p)+
-        '<div class="product-info"><div class="product-name">'+esc(p.title)+'</div>'+
-        '<div class="product-sub" style="margin-top:4px;">'+esc(p.content||'')+'</div>'+promo+'</div></div>';
-    }).join('');
+    fetch('js/posts.json?t='+Date.now()).then(function(r){return r.json()}).then(function(posts){
+      posts=Array.isArray(posts)?posts.filter(function(p){return p.published!==false}).slice(0,4):[];
+      if(!posts.length){el.innerHTML='<div style="text-align:center;color:#9a9a9a;padding:24px;">No community posts yet.</div>';return;}
+      el.style.display='flex';el.style.flexDirection='column';el.style.gap='16px';
+      el.innerHTML=posts.map(function(p){
+        return '<div class="product-card" style="overflow:hidden;">'+mediaHtml(p)+'<div class="product-info"><div class="product-name">'+esc(p.title)+'</div><div class="product-sub">'+esc(p.content||'')+'</div></div></div>';
+      }).join('');
+    }).catch(function(){});
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', renderHomeFeed);
-  else renderHomeFeed();
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', render);
+  else render();
 })();
 </script>
-
 
 </body>
 </html>
