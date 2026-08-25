@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>内容发布 – Nothosaur 后台</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .form-card {
+      background: #161b22; border: 1px solid #30363d; border-radius: 10px;
+      padding: 22px; margin-bottom: 24px; max-width: 720px;
+    }
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+      display: block; font-size: 0.8rem; color: #8b949e; margin-bottom: 6px; font-weight: 600;
+    }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; padding: 10px 12px; background: #0d1117; border: 1px solid #30363d;
+      border-radius: 6px; color: #e6edf3; font-size: 0.95rem; font-family: inherit;
+    }
+    .form-group textarea { min-height: 80px; resize: vertical; }
+    .form-group input[type="file"] {
+      padding: 8px; background: #0d1117; border: 1px dashed #30363d;
+    }
+    .hint { font-size: 0.75rem; color: #6e7681; margin-top: 4px; }
+    .preview-box {
+      margin-top: 10px; padding: 12px; background: #0d1117; border-radius: 8px;
+      border: 1px solid #30363d; display: none; text-align: center;
+    }
+    .preview-box img, .preview-box video {
+      max-width: 100%; max-height: 220px; border-radius: 6px;
+    }
+    .post-row {
+      background: #161b22; border: 1px solid #30363d; border-radius: 10px;
+      padding: 14px 16px; margin-bottom: 12px; display: flex; gap: 14px; align-items: flex-start;
+    }
+    .post-row img {
+      width: 80px; height: 80px; object-fit: cover; border-radius: 6px; flex-shrink: 0; background: #0d0d0d;
+    }
+    .post-row .info { flex: 1; min-width: 0; }
+    .post-row .title { font-weight: 600; margin-bottom: 4px; }
+    .post-row .meta { font-size: 0.8rem; color: #8b949e; }
+  </style>
+<script>
+(function(){
+  if (sessionStorage.getItem('nothosaur_admin_session') !== '1') {
+    location.href = 'login.html';
+  }
+})();
+</script>
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="logo" style="color:#ff1493;font-weight:700;font-size:1.1rem;padding:0 20px 22px;border-bottom:1px solid #30363d;margin-bottom:14px;">
+        NOTHOSAUR 后台
+      </div>
+      <nav class="admin-nav">
+        <a href="index.html">仪表盘</a>
+        <a href="products.html">商品管理</a>
+        <a href="orders.html">订单管理</a>
+        <a href="members.html">会员列表</a>
+        <a href="inquiries.html">客户咨询</a>
+        <a href="content.html" class="active">内容发布</a>
+        <a href="stats.html">数据统计</a>
+        <a href="settings.html">系统设置</a>
+        <a href="../index.html" style="margin-top:24px;color:#ff1493;">← 返回前台</a>
+        <a href="login.html" onclick="sessionStorage.removeItem('nothosaur_admin_session')" style="color:#f87171;">退出登录</a>
+      </nav>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-header">
+        <h1>内容发布</h1>
+        <a href="../community.html" target="_blank" style="font-size:0.88rem;color:#ff1493;">查看前台 Community →</a>
+      </div>
+
+      <div class="form-card">
+        <h3 style="color:#ff1493;margin-bottom:16px;font-size:1rem;">发布新内容</h3>
+        <div class="form-group">
+          <label>类型</label>
+          <select id="post-type" onchange="onTypeChange()">
+            <option value="image">图片</option>
+            <option value="video">视频</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>标题</label>
+          <input type="text" id="post-title" placeholder="例如：New color drop – Ignis">
+        </div>
+        <div class="form-group">
+          <label>内容描述</label>
+          <textarea id="post-content" placeholder="介绍文字..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>从本地选择文件</label>
+          <input type="file" id="post-file" accept="image/*,video/*" onchange="handleLocalFile(event)">
+          <div class="hint" id="file-hint">支持本地图片；视频建议小于 5MB，更大请用下方链接</div>
+          <div class="preview-box" id="local-preview">
+            <img id="local-preview-img" src="" alt="预览" style="display:none;">
+            <video id="local-preview-video" controls style="display:none;"></video>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>或填写图片 / 视频地址（URL）</label>
+          <input type="text" id="post-media" placeholder="图片链接，或 YouTube / 视频直链">
+          <div class="hint">YouTube 链接、图床链接、视频直链都可以</div>
+        </div>
+
+        <div class="form-group">
+          <label>关联推广商品（可选）</label>
+          <select id="post-product">
+            <option value="">不关联商品</option>
+          </select>
+        </div>
+        <button class="btn" style="padding:10px 22px;font-size:0.9rem;" onclick="publishPost()">发布</button>
+      </div>
+
+      <h2 style="font-size:1.1rem;margin-bottom:14px;">已发布内容</h2>
+      <div id="posts-list"></div>
+    </main>
+  </div>
+
+  <script>
+    const POSTS_KEY = 'nothosaur_demo_posts';
+    const PRODUCTS_KEY = 'nothosaur_demo_products';
+    let localDataUrl = '';
+    let localIsVideo = false;
+
+    function getPosts() {
+      try { return JSON.parse(localStorage.getItem(POSTS_KEY) || '[]'); }
+      catch(e) { return []; }
+    }
+    function savePosts(list) {
+      localStorage.setItem(POSTS_KEY, JSON.stringify(list));
+    }
+    function getProducts() {
+      try { return JSON.parse(localStorage.getItem(PRODUCTS_KEY) || '[]'); }
+      catch(e) { return []; }
+    }
+    function escapeHtml(s) {
+      return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function onTypeChange() {
+      const type = document.getElementById('post-type').value;
+      document.getElementById('post-file').accept = type === 'video' ? 'video/*' : 'image/*';
+      document.getElementById('file-hint').textContent = type === 'video'
+        ? '本地视频建议小于 5MB；更大请用 YouTube 或视频直链'
+        : '支持本地图片（建议 2MB 以内）';
+    }
+
+    function handleLocalFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const isVideo = file.type.startsWith('video/');
+      const isImage = file.type.startsWith('image/');
+      if (!isVideo && !isImage) {
+        alert('请选择图片或视频文件');
+        return;
+      }
+
+      const maxSize = isVideo ? 5 * 1024 * 1024 : 2.5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        alert(isVideo ? '本地视频请控制在 5MB 以内，更大请用链接' : '图片请控制在 2.5MB 以内');
+        e.target.value = '';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        localDataUrl = ev.target.result;
+        localIsVideo = isVideo;
+        document.getElementById('post-type').value = isVideo ? 'video' : 'image';
+        document.getElementById('post-media').value = '(本地文件已加载，请点发布)';
+        document.getElementById('local-preview').style.display = 'block';
+        const img = document.getElementById('local-preview-img');
+        const vid = document.getElementById('local-preview-video');
+        if (isVideo) {
+          img.style.display = 'none';
+          vid.style.display = 'block';
+          vid.src = localDataUrl;
+        } else {
+          vid.style.display = 'none';
+          img.style.display = 'block';
+          img.src = localDataUrl;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function loadProductOptions() {
+      let products = getProducts();
+      if (!products.length) {
+        try {
+          const res = await fetch('../js/products.json');
+          products = await res.json();
+        } catch(e) {}
+      }
+      const sel = document.getElementById('post-product');
+      products.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = p.name + ' – $' + Number(p.price).toFixed(2);
+        opt.dataset.image = p.image || '';
+        opt.dataset.name = p.name || '';
+        opt.dataset.price = p.price || 0;
+        sel.appendChild(opt);
+      });
+    }
+
+    function publishPost() {
+      const title = document.getElementById('post-title').value.trim();
+      const content = document.getElementById('post-content').value.trim();
+      let mediaUrl = document.getElementById('post-media').value.trim();
+      let type = document.getElementById('post-type').value;
+
+      if (localDataUrl) {
+        mediaUrl = localDataUrl;
+        type = localIsVideo ? 'video' : 'image';
+      }
+
+      if (!title || !mediaUrl || mediaUrl.includes('本地文件已加载')) {
+        if (!localDataUrl) {
+          alert('请填写标题，并选择本地文件或填写媒体地址');
+          return;
+        }
+        mediaUrl = localDataUrl;
+      }
+
+      const sel = document.getElementById('post-product');
+      const opt = sel.options[sel.selectedIndex];
+      const productId = sel.value;
+
+      const post = {
+        id: 'p' + Date.now(),
+        type,
+        title,
+        content,
+        mediaUrl,
+        productId: productId || null,
+        productName: productId ? opt.dataset.name : null,
+        productImage: productId ? opt.dataset.image : null,
+        productPrice: productId ? parseFloat(opt.dataset.price) : null,
+        comments: [],
+        published: true,
+        createdAt: new Date().toISOString()
+      };
+
+      const list = getPosts();
+      list.unshift(post);
+      savePosts(list);
+
+      document.getElementById('post-title').value = '';
+      document.getElementById('post-content').value = '';
+      document.getElementById('post-media').value = '';
+      document.getElementById('post-file').value = '';
+      document.getElementById('post-product').value = '';
+      document.getElementById('local-preview').style.display = 'none';
+      localDataUrl = '';
+      localIsVideo = false;
+
+      alert('发布成功！请到前台 Community 查看。');
+      renderList();
+    }
+
+    function deletePost(id) {
+      if (!confirm('确定删除？')) return;
+      savePosts(getPosts().filter(p => p.id !== id));
+      renderList();
+    }
+
+    function renderList() {
+      const list = getPosts();
+      const el = document.getElementById('posts-list');
+      if (!list.length) {
+        el.innerHTML = '<div style="color:#8b949e;padding:30px;text-align:center;">暂无内容</div>';
+        return;
+      }
+      el.innerHTML = list.map(p => `
+        <div class="post-row">
+          ${p.type === 'video'
+            ? '<div style="width:80px;height:80px;background:#0d0d0d;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">▶</div>'
+            : '<img src="' + escapeHtml(p.mediaUrl) + '" onerror="this.style.opacity=0.3">'}
+          <div class="info">
+            <div class="title">${escapeHtml(p.title)}</div>
+            <div class="meta">${p.type === 'video' ? '视频' : '图片'} · ${p.productName ? '推广: ' + escapeHtml(p.productName) : '无商品'} · 评论 ${(p.comments||[]).length} 条</div>
+            <div class="meta" style="margin-top:4px;">${new Date(p.createdAt).toLocaleString('zh-CN')}</div>
+          </div>
+          <button style="background:none;border:1px solid #30363d;color:#f87171;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:0.8rem;" onclick="deletePost('${p.id}')">删除</button>
+        </div>
+      `).join('');
+    }
+
+    loadProductOptions();
+    renderList();
+    onTypeChange();
+  </script>
+</body>
+</html>

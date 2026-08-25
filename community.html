@@ -9,94 +9,46 @@
     .feed-container { max-width: 680px; margin: 0 auto; padding: 16px 14px 40px; }
     .feed-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .feed-header h1 { font-size: 1.4rem; }
-    .post-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
-    .post-media {
-      width: 100%;
-      background: #0d0d0d;
-      max-height: 480px;
-      object-fit: contain;
-      display: block;
-    }
-    .post-media video { width: 100%; max-height: 480px; display: block; background: #000; }
+    .post-card { background: #121212; border: 1px solid #252525; border-radius: 14px; margin-bottom: 20px; overflow: hidden; }
     .post-body { padding: 14px 16px; }
     .post-title { font-size: 1.05rem; font-weight: 650; margin-bottom: 6px; }
-    .post-text { font-size: 0.92rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px; }
+    .post-text { font-size: 0.92rem; color: #9a9a9a; line-height: 1.5; margin-bottom: 12px; }
     .product-promo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: rgba(255,20,147,0.08);
-      border: 1px solid rgba(255,20,147,0.25);
-      border-radius: 10px;
-      padding: 10px 12px;
-      margin-bottom: 14px;
-      text-decoration: none;
-      color: inherit;
+      display: flex; align-items: center; gap: 12px; background: rgba(255,20,147,0.08);
+      border: 1px solid rgba(255,20,147,0.25); border-radius: 10px; padding: 10px 12px;
+      margin-bottom: 14px; text-decoration: none; color: inherit;
     }
-    .product-promo img {
-      width: 48px; height: 62px; object-fit: cover; border-radius: 6px; flex-shrink: 0;
-    }
+    .product-promo img { width: 48px; height: 62px; object-fit: cover; border-radius: 6px; }
     .product-promo .name { font-weight: 600; font-size: 0.92rem; }
-    .product-promo .price { color: var(--pink); font-size: 0.85rem; }
-    .product-promo .cta { margin-left: auto; font-size: 0.8rem; color: var(--pink); font-weight: 600; }
-    .comments { border-top: 1px solid var(--border); padding-top: 12px; }
-    .comment {
-      font-size: 0.88rem;
-      margin-bottom: 10px;
-      line-height: 1.45;
-    }
-    .comment .who { font-weight: 600; color: var(--pink); margin-right: 6px; }
+    .product-promo .price { color: #ff1493; font-size: 0.85rem; }
+    .product-promo .cta { margin-left: auto; font-size: 0.8rem; color: #ff1493; font-weight: 600; }
+    .comments { border-top: 1px solid #252525; padding-top: 12px; }
+    .comment { font-size: 0.88rem; margin-bottom: 10px; }
+    .comment .who { font-weight: 600; color: #ff1493; margin-right: 6px; }
     .comment-form { display: flex; gap: 8px; margin-top: 10px; }
     .comment-form input {
-      flex: 1;
-      padding: 10px 12px;
-      background: #0d0d0d;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-size: 0.9rem;
+      flex: 1; padding: 10px 12px; background: #0d0d0d; border: 1px solid #252525;
+      border-radius: 8px; color: #f5f5f5; font-size: 0.9rem;
     }
     .comment-form button {
-      padding: 10px 16px;
-      background: var(--pink);
-      border: none;
-      border-radius: 8px;
-      color: #fff;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.88rem;
+      padding: 10px 16px; background: #ff1493; border: none; border-radius: 8px;
+      color: #fff; font-weight: 600; cursor: pointer;
     }
-    .empty-feed {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--text-muted);
-    }
+    .empty-feed { text-align: center; padding: 60px 20px; color: #9a9a9a; }
   </style>
 </head>
-<body>
+<body style="background:#0a0a0a;color:#f5f5f5;font-family:system-ui,sans-serif;margin:0;">
   <header class="header">
     <div class="header-inner">
-      <a href="index.html" class="logo">
-        <svg viewBox="0 0 40 40" fill="none"><path d="M20 4 C12 8 6 16 8 26 C10 32 16 36 20 36 C24 36 30 32 32 26 C34 16 28 8 20 4 Z" fill="#ff1493"/></svg>
-        <span>NOTHOSAUR</span>
-      </a>
-      <nav class="nav">
-        <a href="collections.html">Shop All</a>
-        <a href="community.html" class="active">Community</a>
-        <a href="collections.html">New Releases</a>
-      </nav>
+      <a href="index.html" class="logo"><span style="color:#ff1493;font-weight:700;">NOTHOSAUR</span></a>
       <div class="header-actions">
-        <button onclick="openCart()" title="Cart">🛒 <span class="cart-count" style="display:none">0</span></button>
-        <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
+        <button onclick="location.href=localStorage.getItem('nothosaur_demo_session')?'account.html':'login.html'" style="background:none;border:none;color:#fff;font-size:1.2rem;">👤</button>
+        <button class="menu-toggle" onclick="document.getElementById('mobile-nav').classList.toggle('open')" style="background:none;border:none;color:#fff;font-size:1.4rem;">☰</button>
       </div>
     </div>
     <div class="mobile-nav" id="mobile-nav">
+      <a href="login.html">Sign In</a>
+      <a href="register.html">Register</a>
       <a href="index.html">Home</a>
       <a href="collections.html">Shop All</a>
       <a href="community.html">Community</a>
@@ -106,123 +58,66 @@
   <div class="feed-container">
     <div class="feed-header">
       <h1>Community</h1>
-      <span style="font-size:0.85rem;color:var(--text-muted);">Photos · Videos · Reviews</span>
+      <span style="font-size:0.85rem;color:#9a9a9a;">Photos · Videos · Reviews</span>
     </div>
-    <div id="feed-list">
-      <div class="empty-feed">No posts yet. Check back soon.</div>
-    </div>
+    <div id="feed-list"><div class="empty-feed">Loading...</div></div>
   </div>
 
-  <div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
-  <div class="cart-drawer" id="cart-drawer">
-    <div class="cart-header">
-      <h3>Your Cart</h3>
-      <button onclick="closeCart()" style="background:none;border:none;color:#fff;font-size:1.4rem;cursor:pointer;">×</button>
-    </div>
-    <div class="cart-items" id="cart-items"></div>
-    <div class="cart-footer">
-      <div class="cart-total"><span>Total</span><span id="cart-total-price">$0.00</span></div>
-      <button class="btn" style="width:100%;" onclick="alert('Demo only')">Checkout</button>
-    </div>
-  </div>
-
-  <script src="js/app.js"></script>
   <script>
-    const POSTS_KEY = 'nothosaur_demo_posts';
+    var posts = [];
+    var COMMENTS_KEY = 'nothosaur_demo_comments';
+    function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function getComments(){ try{return JSON.parse(localStorage.getItem(COMMENTS_KEY)||'{}');}catch(e){return{};} }
+    function saveComments(m){ localStorage.setItem(COMMENTS_KEY, JSON.stringify(m)); }
 
-    function getPosts() {
-      try { return JSON.parse(localStorage.getItem(POSTS_KEY) || '[]'); }
-      catch(e) { return []; }
-    }
-    function savePosts(list) {
-      localStorage.setItem(POSTS_KEY, JSON.stringify(list));
-    }
-    function escapeHtml(s) {
-      return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-
-    function renderFeed() {
-      const posts = getPosts().filter(p => p.published !== false);
-      const el = document.getElementById('feed-list');
-      if (!posts.length) {
-        el.innerHTML = '<div class="empty-feed">No posts yet. Check back soon.</div>';
-        return;
+    function mediaHtml(p){
+      var url = p.mediaUrl || '';
+      if(p.type === 'video'){
+        if(url.indexOf('youtube.com')>-1 || url.indexOf('youtu.be')>-1){
+          var vid = url;
+          if(vid.indexOf('watch?v=')>-1) vid = vid.split('watch?v=')[1].split('&')[0];
+          else if(vid.indexOf('youtu.be/')>-1) vid = vid.split('youtu.be/')[1].split('?')[0];
+          return '<div style="position:relative;padding-bottom:56.25%;height:0;background:#000;"><iframe src="https://www.youtube.com/embed/'+vid+'?rel=0" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen></iframe></div>';
+        }
+        return '<video src="'+esc(url)+'" controls playsinline preload="metadata" style="width:100%;max-height:480px;background:#000;display:block;"></video>';
       }
-      el.innerHTML = posts.map(p => {
-        let media = '';
-        if (p.type === 'video') {
-          if (p.mediaUrl.includes('youtube.com') || p.mediaUrl.includes('youtu.be')) {
-            let vid = p.mediaUrl;
-            if (vid.includes('watch?v=')) vid = vid.split('watch?v=')[1].split('&')[0];
-            else if (vid.includes('youtu.be/')) vid = vid.split('youtu.be/')[1].split('?')[0];
-            media = `<div style="position:relative;padding-bottom:56.25%;height:0;"><iframe src="https://www.youtube.com/embed/${vid}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen></iframe></div>`;
-          } else {
-            media = `<video class="post-media" src="${escapeHtml(p.mediaUrl)}" controls playsinline></video>`;
-          }
-        } else {
-          media = `<img class="post-media" src="${escapeHtml(p.mediaUrl)}" alt="" onerror="this.style.display='none'">`;
+      return '<img src="'+esc(url)+'" style="width:100%;max-height:480px;object-fit:contain;background:#0d0d0d;display:block;" onerror="this.style.display=\'none\'">';
+    }
+
+    function renderFeed(){
+      var el = document.getElementById('feed-list');
+      var list = posts.filter(function(p){ return p.published !== false; });
+      var cMap = getComments();
+      if(!list.length){ el.innerHTML = '<div class="empty-feed">No posts yet.</div>'; return; }
+      el.innerHTML = list.map(function(p){
+        var promo = '';
+        if(p.productId){
+          promo = '<a class="product-promo" href="product.html?id='+esc(p.productId)+'"><img src="'+esc(p.productImage||'')+'"><div><div class="name">'+esc(p.productName||'')+'</div><div class="price">From $'+Number(p.productPrice||0).toFixed(2)+'</div></div><div class="cta">Shop →</div></a>';
         }
-
-        let promo = '';
-        if (p.productId) {
-          promo = `
-            <a class="product-promo" href="product.html?id=${escapeHtml(p.productId)}">
-              <img src="${escapeHtml(p.productImage || '')}" alt="">
-              <div>
-                <div class="name">${escapeHtml(p.productName || '')}</div>
-                <div class="price">From $${Number(p.productPrice||0).toFixed(2)}</div>
-              </div>
-              <div class="cta">Shop →</div>
-            </a>
-          `;
-        }
-
-        const comments = (p.comments || []).map(c => `
-          <div class="comment"><span class="who">${escapeHtml(c.name||'User')}:</span>${escapeHtml(c.text)}</div>
-        `).join('');
-
-        return `
-          <div class="post-card" data-id="${p.id}">
-            ${media}
-            <div class="post-body">
-              <div class="post-title">${escapeHtml(p.title||'')}</div>
-              <div class="post-text">${escapeHtml(p.content||'')}</div>
-              ${promo}
-              <div class="comments">
-                ${comments || '<div style="font-size:0.85rem;color:var(--text-muted);">No comments yet</div>'}
-                <div class="comment-form">
-                  <input type="text" placeholder="Write a comment..." id="cmt-${p.id}" onkeydown="if(event.key==='Enter')addComment('${p.id}')">
-                  <button onclick="addComment('${p.id}')">Post</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
+        var comments = cMap[p.id] || p.comments || [];
+        var cHtml = comments.map(function(c){ return '<div class="comment"><span class="who">'+esc(c.name||'User')+':</span>'+esc(c.text)+'</div>'; }).join('') || '<div style="font-size:0.85rem;color:#9a9a9a;">No comments yet</div>';
+        return '<div class="post-card">'+mediaHtml(p)+'<div class="post-body"><div class="post-title">'+esc(p.title||'')+'</div><div class="post-text">'+esc(p.content||'')+'</div>'+promo+'<div class="comments">'+cHtml+'<div class="comment-form"><input type="text" placeholder="Write a comment..." id="cmt-'+esc(p.id)+'"><button onclick="addComment(\''+esc(p.id)+'\')">Post</button></div></div></div></div>';
       }).join('');
     }
 
-    function addComment(postId) {
-      const input = document.getElementById('cmt-' + postId);
-      const text = (input?.value || '').trim();
-      if (!text) return;
-      const posts = getPosts();
-      const p = posts.find(x => x.id === postId);
-      if (!p) return;
-      if (!p.comments) p.comments = [];
-      p.comments.push({
-        name: 'Guest',
-        text,
-        time: new Date().toISOString()
-      });
-      savePosts(posts);
+    function addComment(postId){
+      var input = document.getElementById('cmt-'+postId);
+      var text = (input && input.value || '').trim();
+      if(!text) return;
+      var session = null;
+      try{ session = JSON.parse(localStorage.getItem('nothosaur_demo_session')||'null'); }catch(e){}
+      var map = getComments();
+      if(!map[postId]) map[postId] = [];
+      map[postId].push({ name: (session && session.name) || 'Guest', text: text, time: new Date().toISOString() });
+      saveComments(map);
       input.value = '';
       renderFeed();
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      if (typeof loadProducts === 'function') loadProducts().then(() => {});
+    fetch('js/posts.json?t='+Date.now()).then(function(r){ return r.json(); }).then(function(data){
+      posts = Array.isArray(data) ? data : [];
       renderFeed();
-    });
+    }).catch(function(){ renderFeed(); });
   </script>
 </body>
 </html>

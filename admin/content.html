@@ -2,59 +2,43 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>内容发布 – Nothosaur 后台</title>
   <link rel="stylesheet" href="../css/style.css">
+  <script>
+  (function(){
+    if (sessionStorage.getItem('nothosaur_admin_session') !== '1') {
+      location.href = 'login.html';
+    }
+  })();
+  </script>
   <style>
-    .form-card {
-      background: #161b22; border: 1px solid #30363d; border-radius: 10px;
-      padding: 22px; margin-bottom: 24px; max-width: 720px;
-    }
-    .form-group { margin-bottom: 14px; }
-    .form-group label {
-      display: block; font-size: 0.8rem; color: #8b949e; margin-bottom: 6px; font-weight: 600;
-    }
+    .form-card { background:#161b22; border:1px solid #30363d; border-radius:10px; padding:20px; margin-bottom:20px; max-width:720px; }
+    .form-group { margin-bottom:14px; }
+    .form-group label { display:block; font-size:0.8rem; color:#8b949e; margin-bottom:6px; font-weight:600; }
     .form-group input, .form-group textarea, .form-group select {
-      width: 100%; padding: 10px 12px; background: #0d1117; border: 1px solid #30363d;
-      border-radius: 6px; color: #e6edf3; font-size: 0.95rem; font-family: inherit;
+      width:100%; padding:12px; background:#0d1117; border:1px solid #30363d;
+      border-radius:8px; color:#e6edf3; font-size:1rem; font-family:inherit; box-sizing:border-box;
     }
-    .form-group textarea { min-height: 80px; resize: vertical; }
-    .form-group input[type="file"] {
-      padding: 8px; background: #0d1117; border: 1px dashed #30363d;
-    }
-    .hint { font-size: 0.75rem; color: #6e7681; margin-top: 4px; }
-    .preview-box {
-      margin-top: 10px; padding: 12px; background: #0d1117; border-radius: 8px;
-      border: 1px solid #30363d; display: none; text-align: center;
-    }
-    .preview-box img, .preview-box video {
-      max-width: 100%; max-height: 220px; border-radius: 6px;
-    }
-    .post-row {
-      background: #161b22; border: 1px solid #30363d; border-radius: 10px;
-      padding: 14px 16px; margin-bottom: 12px; display: flex; gap: 14px; align-items: flex-start;
-    }
-    .post-row img {
-      width: 80px; height: 80px; object-fit: cover; border-radius: 6px; flex-shrink: 0; background: #0d0d0d;
-    }
-    .post-row .info { flex: 1; min-width: 0; }
-    .post-row .title { font-weight: 600; margin-bottom: 4px; }
-    .post-row .meta { font-size: 0.8rem; color: #8b949e; }
+    .form-group textarea { min-height:80px; }
+    .form-group input[type="file"] { padding:12px; border:1px dashed #30363d; }
+    .hint { font-size:0.75rem; color:#6e7681; margin-top:4px; }
+    .preview-box { margin-top:10px; display:none; text-align:center; }
+    .preview-box img, .preview-box video { max-width:100%; max-height:240px; border-radius:8px; background:#000; }
+    .post-row { background:#161b22; border:1px solid #30363d; border-radius:10px; padding:14px; margin-bottom:12px; display:flex; gap:12px; align-items:flex-start; }
+    .post-row .info { flex:1; min-width:0; }
+    .status { margin-top:8px; font-size:0.85rem; color:#8b949e; }
+    .status.ok { color:#22c55e; }
+    .status.err { color:#f87171; }
   </style>
-<script>
-(function(){
-  if (sessionStorage.getItem('nothosaur_admin_session') !== '1') {
-    location.href = 'login.html';
-  }
-})();
-</script>
 </head>
 <body class="admin-body">
+<button type="button" class="admin-sidebar-toggle" id="admin-sidebar-toggle" aria-label="菜单">☰</button>
+<div class="admin-sidebar-overlay" id="admin-sidebar-overlay"></div>
+
   <div class="admin-layout">
     <aside class="admin-sidebar">
-      <div class="logo" style="color:#ff1493;font-weight:700;font-size:1.1rem;padding:0 20px 22px;border-bottom:1px solid #30363d;margin-bottom:14px;">
-        NOTHOSAUR 后台
-      </div>
+      <div class="logo" style="color:#ff1493;font-weight:700;padding:0 16px 18px;border-bottom:1px solid #30363d;margin-bottom:12px;">NOTHOSAUR 后台</div>
       <nav class="admin-nav">
         <a href="index.html">仪表盘</a>
         <a href="products.html">商品管理</a>
@@ -64,7 +48,7 @@
         <a href="content.html" class="active">内容发布</a>
         <a href="stats.html">数据统计</a>
         <a href="settings.html">系统设置</a>
-        <a href="../index.html" style="margin-top:24px;color:#ff1493;">← 返回前台</a>
+        <a href="../index.html" style="margin-top:20px;color:#ff1493;">← 返回前台</a>
         <a href="login.html" onclick="sessionStorage.removeItem('nothosaur_admin_session')" style="color:#f87171;">退出登录</a>
       </nav>
     </aside>
@@ -72,232 +56,222 @@
     <main class="admin-main">
       <div class="admin-header">
         <h1>内容发布</h1>
-        <a href="../community.html" target="_blank" style="font-size:0.88rem;color:#ff1493;">查看前台 Community →</a>
+        <a href="../community.html" target="_blank" style="color:#ff1493;font-size:0.88rem;">查看社区 →</a>
       </div>
 
       <div class="form-card">
-        <h3 style="color:#ff1493;margin-bottom:16px;font-size:1rem;">发布新内容</h3>
+        <h3 style="color:#ff1493;margin-bottom:14px;">发布（支持手机上传视频）</h3>
         <div class="form-group">
           <label>类型</label>
-          <select id="post-type" onchange="onTypeChange()">
+          <select id="post-type">
             <option value="image">图片</option>
             <option value="video">视频</option>
           </select>
         </div>
         <div class="form-group">
-          <label>标题</label>
-          <input type="text" id="post-title" placeholder="例如：New color drop – Ignis">
+          <label>标题 *</label>
+          <input type="text" id="post-title" placeholder="标题">
         </div>
         <div class="form-group">
-          <label>内容描述</label>
-          <textarea id="post-content" placeholder="介绍文字..."></textarea>
+          <label>描述</label>
+          <textarea id="post-content" placeholder="介绍..."></textarea>
         </div>
-
         <div class="form-group">
-          <label>从本地选择文件</label>
-          <input type="file" id="post-file" accept="image/*,video/*" onchange="handleLocalFile(event)">
-          <div class="hint" id="file-hint">支持本地图片；视频建议小于 5MB，更大请用下方链接</div>
-          <div class="preview-box" id="local-preview">
-            <img id="local-preview-img" src="" alt="预览" style="display:none;">
-            <video id="local-preview-video" controls style="display:none;"></video>
+          <label>选择图片 / 视频文件（手机可直接拍或选相册）</label>
+          <input type="file" id="post-file" accept="image/*,video/*" capture="environment">
+          <div class="hint">视频建议 MP4，最大约 50MB。上传到服务器后全网可见。</div>
+          <div class="preview-box" id="preview">
+            <img id="preview-img" style="display:none">
+            <video id="preview-video" controls playsinline style="display:none"></video>
           </div>
+          <div class="status" id="upload-status"></div>
         </div>
-
         <div class="form-group">
-          <label>或填写图片 / 视频地址（URL）</label>
-          <input type="text" id="post-media" placeholder="图片链接，或 YouTube / 视频直链">
-          <div class="hint">YouTube 链接、图床链接、视频直链都可以</div>
+          <label>或填写外链（YouTube / 图片 URL）</label>
+          <input type="text" id="post-media" placeholder="可选：外链地址">
         </div>
-
         <div class="form-group">
-          <label>关联推广商品（可选）</label>
-          <select id="post-product">
-            <option value="">不关联商品</option>
-          </select>
+          <label>关联商品</label>
+          <select id="post-product"><option value="">不关联</option></select>
         </div>
-        <button class="btn" style="padding:10px 22px;font-size:0.9rem;" onclick="publishPost()">发布</button>
+        <button class="btn" style="width:100%;padding:14px;font-size:1rem;" onclick="publishPost()">发布并同步</button>
+        <div class="status" id="pub-status"></div>
       </div>
 
-      <h2 style="font-size:1.1rem;margin-bottom:14px;">已发布内容</h2>
+      <h2 style="font-size:1.05rem;margin-bottom:12px;">已发布</h2>
       <div id="posts-list"></div>
     </main>
   </div>
 
   <script>
-    const POSTS_KEY = 'nothosaur_demo_posts';
-    const PRODUCTS_KEY = 'nothosaur_demo_products';
-    let localDataUrl = '';
-    let localIsVideo = false;
+    let posts = [];
+    let uploadedUrl = '';
 
-    function getPosts() {
-      try { return JSON.parse(localStorage.getItem(POSTS_KEY) || '[]'); }
-      catch(e) { return []; }
-    }
-    function savePosts(list) {
-      localStorage.setItem(POSTS_KEY, JSON.stringify(list));
-    }
-    function getProducts() {
-      try { return JSON.parse(localStorage.getItem(PRODUCTS_KEY) || '[]'); }
-      catch(e) { return []; }
-    }
-    function escapeHtml(s) {
-      return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    async function loadPosts() {
+      try {
+        const res = await fetch('../js/posts.json?t=' + Date.now());
+        if (res.ok) posts = await res.json();
+        if (!Array.isArray(posts)) posts = [];
+      } catch(e) { posts = []; }
+      renderList();
     }
 
-    function onTypeChange() {
-      const type = document.getElementById('post-type').value;
-      document.getElementById('post-file').accept = type === 'video' ? 'video/*' : 'image/*';
-      document.getElementById('file-hint').textContent = type === 'video'
-        ? '本地视频建议小于 5MB；更大请用 YouTube 或视频直链'
-        : '支持本地图片（建议 2MB 以内）';
-    }
-
-    function handleLocalFile(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const isVideo = file.type.startsWith('video/');
-      const isImage = file.type.startsWith('image/');
-      if (!isVideo && !isImage) {
-        alert('请选择图片或视频文件');
-        return;
-      }
-
-      const maxSize = isVideo ? 5 * 1024 * 1024 : 2.5 * 1024 * 1024;
-      if (file.size > maxSize) {
-        alert(isVideo ? '本地视频请控制在 5MB 以内，更大请用链接' : '图片请控制在 2.5MB 以内');
-        e.target.value = '';
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function(ev) {
-        localDataUrl = ev.target.result;
-        localIsVideo = isVideo;
-        document.getElementById('post-type').value = isVideo ? 'video' : 'image';
-        document.getElementById('post-media').value = '(本地文件已加载，请点发布)';
-        document.getElementById('local-preview').style.display = 'block';
-        const img = document.getElementById('local-preview-img');
-        const vid = document.getElementById('local-preview-video');
-        if (isVideo) {
-          img.style.display = 'none';
-          vid.style.display = 'block';
-          vid.src = localDataUrl;
-        } else {
-          vid.style.display = 'none';
-          img.style.display = 'block';
-          img.src = localDataUrl;
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-
-    async function loadProductOptions() {
-      let products = getProducts();
-      if (!products.length) {
-        try {
-          const res = await fetch('../js/products.json');
-          products = await res.json();
-        } catch(e) {}
-      }
+    async function loadProducts() {
+      let products = [];
+      try {
+        const res = await fetch('../js/products.json');
+        products = await res.json();
+      } catch(e) {}
       const sel = document.getElementById('post-product');
       products.forEach(p => {
-        const opt = document.createElement('option');
-        opt.value = p.id;
-        opt.textContent = p.name + ' – $' + Number(p.price).toFixed(2);
-        opt.dataset.image = p.image || '';
-        opt.dataset.name = p.name || '';
-        opt.dataset.price = p.price || 0;
-        sel.appendChild(opt);
+        const o = document.createElement('option');
+        o.value = p.id;
+        o.textContent = p.name;
+        o.dataset.image = p.image || '';
+        o.dataset.name = p.name || '';
+        o.dataset.price = p.price || 0;
+        sel.appendChild(o);
       });
     }
 
-    function publishPost() {
+    document.getElementById('post-file').addEventListener('change', async function(e) {
+      const file = e.target.files[0];
+      uploadedUrl = '';
+      const st = document.getElementById('upload-status');
+      const box = document.getElementById('preview');
+      const img = document.getElementById('preview-img');
+      const vid = document.getElementById('preview-video');
+      if (!file) { box.style.display = 'none'; st.textContent = ''; return; }
+
+      box.style.display = 'block';
+      const isVideo = file.type.startsWith('video/');
+      document.getElementById('post-type').value = isVideo ? 'video' : 'image';
+      const localUrl = URL.createObjectURL(file);
+      if (isVideo) {
+        img.style.display = 'none'; vid.style.display = 'block'; vid.src = localUrl;
+      } else {
+        vid.style.display = 'none'; img.style.display = 'block'; img.src = localUrl;
+      }
+
+      st.textContent = '正在上传到服务器...';
+      st.className = 'status';
+      const fd = new FormData();
+      fd.append('file', file);
+      try {
+        const res = await fetch('upload.php', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (data.ok) {
+          uploadedUrl = data.url;
+          st.textContent = '上传成功: ' + data.url;
+          st.className = 'status ok';
+          document.getElementById('post-media').value = data.url;
+        } else {
+          st.textContent = '上传失败: ' + (data.error || '');
+          st.className = 'status err';
+        }
+      } catch (err) {
+        st.textContent = '上传失败: ' + err.message;
+        st.className = 'status err';
+      }
+    });
+
+    async function publishPost() {
       const title = document.getElementById('post-title').value.trim();
       const content = document.getElementById('post-content').value.trim();
-      let mediaUrl = document.getElementById('post-media').value.trim();
-      let type = document.getElementById('post-type').value;
-
-      if (localDataUrl) {
-        mediaUrl = localDataUrl;
-        type = localIsVideo ? 'video' : 'image';
-      }
-
-      if (!title || !mediaUrl || mediaUrl.includes('本地文件已加载')) {
-        if (!localDataUrl) {
-          alert('请填写标题，并选择本地文件或填写媒体地址');
-          return;
-        }
-        mediaUrl = localDataUrl;
-      }
+      let mediaUrl = uploadedUrl || document.getElementById('post-media').value.trim();
+      const type = document.getElementById('post-type').value;
+      const st = document.getElementById('pub-status');
+      if (!title) { alert('请填标题'); return; }
+      if (!mediaUrl) { alert('请上传文件或填写链接'); return; }
 
       const sel = document.getElementById('post-product');
       const opt = sel.options[sel.selectedIndex];
       const productId = sel.value;
 
-      const post = {
+      posts.unshift({
         id: 'p' + Date.now(),
-        type,
-        title,
-        content,
-        mediaUrl,
+        type, title, content, mediaUrl,
         productId: productId || null,
         productName: productId ? opt.dataset.name : null,
         productImage: productId ? opt.dataset.image : null,
         productPrice: productId ? parseFloat(opt.dataset.price) : null,
-        comments: [],
-        published: true,
+        comments: [], published: true,
         createdAt: new Date().toISOString()
-      };
+      });
 
-      const list = getPosts();
-      list.unshift(post);
-      savePosts(list);
-
-      document.getElementById('post-title').value = '';
-      document.getElementById('post-content').value = '';
-      document.getElementById('post-media').value = '';
-      document.getElementById('post-file').value = '';
-      document.getElementById('post-product').value = '';
-      document.getElementById('local-preview').style.display = 'none';
-      localDataUrl = '';
-      localIsVideo = false;
-
-      alert('发布成功！请到前台 Community 查看。');
-      renderList();
+      st.textContent = '正在同步...';
+      try {
+        const res = await fetch('save-posts.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(posts)
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error('save failed');
+        st.textContent = '发布成功！手机打开社区页即可看到';
+        st.className = 'status ok';
+        document.getElementById('post-title').value = '';
+        document.getElementById('post-content').value = '';
+        document.getElementById('post-media').value = '';
+        document.getElementById('post-file').value = '';
+        document.getElementById('preview').style.display = 'none';
+        uploadedUrl = '';
+        renderList();
+      } catch (e) {
+        st.textContent = '同步失败: ' + e.message;
+        st.className = 'status err';
+      }
     }
 
     function deletePost(id) {
-      if (!confirm('确定删除？')) return;
-      savePosts(getPosts().filter(p => p.id !== id));
-      renderList();
+      if (!confirm('删除？')) return;
+      posts = posts.filter(p => p.id !== id);
+      fetch('save-posts.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(posts)
+      }).then(() => renderList());
     }
 
     function renderList() {
-      const list = getPosts();
       const el = document.getElementById('posts-list');
-      if (!list.length) {
-        el.innerHTML = '<div style="color:#8b949e;padding:30px;text-align:center;">暂无内容</div>';
+      if (!posts.length) {
+        el.innerHTML = '<div style="color:#8b949e;padding:20px;text-align:center;">暂无内容</div>';
         return;
       }
-      el.innerHTML = list.map(p => `
+      el.innerHTML = posts.map(p => `
         <div class="post-row">
-          ${p.type === 'video'
-            ? '<div style="width:80px;height:80px;background:#0d0d0d;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">▶</div>'
-            : '<img src="' + escapeHtml(p.mediaUrl) + '" onerror="this.style.opacity=0.3">'}
           <div class="info">
-            <div class="title">${escapeHtml(p.title)}</div>
-            <div class="meta">${p.type === 'video' ? '视频' : '图片'} · ${p.productName ? '推广: ' + escapeHtml(p.productName) : '无商品'} · 评论 ${(p.comments||[]).length} 条</div>
-            <div class="meta" style="margin-top:4px;">${new Date(p.createdAt).toLocaleString('zh-CN')}</div>
+            <div style="font-weight:600;">${esc(p.title)}</div>
+            <div style="font-size:0.8rem;color:#8b949e;margin-top:4px;">${p.type==='video'?'视频':'图片'} · ${esc(p.mediaUrl).slice(0,60)}</div>
           </div>
-          <button style="background:none;border:1px solid #30363d;color:#f87171;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:0.8rem;" onclick="deletePost('${p.id}')">删除</button>
+          <button style="background:none;border:1px solid #30363d;color:#f87171;padding:4px 10px;border-radius:4px;cursor:pointer;" onclick="deletePost('${p.id}')">删除</button>
         </div>
       `).join('');
     }
 
-    loadProductOptions();
-    renderList();
-    onTypeChange();
+    loadPosts();
+    loadProducts();
   </script>
+
+<script>
+(function(){
+  var side = document.querySelector('.admin-sidebar');
+  var btn = document.getElementById('admin-sidebar-toggle');
+  var ov = document.getElementById('admin-sidebar-overlay');
+  if(!side || !btn) return;
+  function open(){ side.classList.add('open'); if(ov) ov.classList.add('open'); }
+  function close(){ side.classList.remove('open'); if(ov) ov.classList.remove('open'); }
+  function toggle(){ side.classList.contains('open') ? close() : open(); }
+  btn.addEventListener('click', toggle);
+  if(ov) ov.addEventListener('click', close);
+  side.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ if(window.innerWidth <= 900) close(); });
+  });
+})();
+</script>
+
 </body>
 </html>

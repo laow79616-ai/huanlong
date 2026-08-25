@@ -167,6 +167,9 @@
 </script>
 </head>
 <body class="admin-body">
+<button type="button" class="admin-sidebar-toggle" id="admin-sidebar-toggle" aria-label="菜单">☰</button>
+<div class="admin-sidebar-overlay" id="admin-sidebar-overlay"></div>
+
   <div class="admin-layout">
     <aside class="admin-sidebar">
       <div class="logo" style="color:#ff1493;font-weight:700;font-size:1.1rem;padding:0 20px 22px;border-bottom:1px solid #30363d;margin-bottom:14px;">
@@ -353,5 +356,23 @@
     renderSessionList();
     setInterval(renderSessionList, 5000);
   </script>
+
+<script>
+(function(){
+  var side = document.querySelector('.admin-sidebar');
+  var btn = document.getElementById('admin-sidebar-toggle');
+  var ov = document.getElementById('admin-sidebar-overlay');
+  if(!side || !btn) return;
+  function open(){ side.classList.add('open'); if(ov) ov.classList.add('open'); }
+  function close(){ side.classList.remove('open'); if(ov) ov.classList.remove('open'); }
+  function toggle(){ side.classList.contains('open') ? close() : open(); }
+  btn.addEventListener('click', toggle);
+  if(ov) ov.addEventListener('click', close);
+  side.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ if(window.innerWidth <= 900) close(); });
+  });
+})();
+</script>
+
 </body>
 </html>

@@ -654,3 +654,65 @@ button { font-family: inherit; }
     gap: 22px;
   }
 }
+
+/* Admin mobile sidebar toggle */
+.admin-sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 400;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid #30363d;
+  background: #161b22;
+  color: #ff1493;
+  font-size: 1.2rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+.admin-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 350;
+}
+.admin-sidebar-overlay.open { display: block; }
+
+@media (max-width: 900px) {
+  .admin-sidebar-toggle { display: flex; }
+  .admin-layout { display: block; }
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 240px;
+    max-width: 80vw;
+    z-index: 360;
+    transform: translateX(-105%);
+    transition: transform 0.25s ease;
+    overflow-y: auto;
+    box-shadow: none;
+  }
+  .admin-sidebar.open {
+    transform: translateX(0);
+    box-shadow: 8px 0 24px rgba(0,0,0,0.4);
+  }
+  .admin-main {
+    padding: 56px 14px 24px !important;
+    width: 100%;
+    max-width: 100%;
+  }
+  .admin-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .form-card, .settings-card {
+    max-width: 100% !important;
+  }
+}
