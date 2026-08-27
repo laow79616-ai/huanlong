@@ -145,7 +145,45 @@
         <button class="btn" style="padding:10px 18px;font-size:0.88rem;background:#30363d;margin-right:10px;" onclick="resetOrders()">重置订单数据</button>
         <button class="btn" style="padding:10px 18px;font-size:0.88rem;background:#30363d;" onclick="resetMembers()">重置会员数据</button>
       </div>
-    </main>
+    
+      <div class="settings-card" id="support-card" style="background:#161b22;border:1px solid #30363d;border-radius:10px;padding:16px;margin:16px 0;">
+        <h3 style="color:#ff1493;">客服入口（前台「客服支持」点击跳转）</h3>
+        <label style="display:block;margin:10px 0 4px;color:#8b949e;font-size:0.8rem;">类型</label>
+        <select id="support-type" style="width:100%;padding:10px;background:#0d1117;border:1px solid #30363d;color:#fff;border-radius:8px;">
+          <option value="link">网址 / 在线客服</option>
+          <option value="telegram">Telegram</option>
+          <option value="whatsapp">WhatsApp</option>
+          <option value="email">邮箱</option>
+        </select>
+        <label style="display:block;margin:10px 0 4px;color:#8b949e;font-size:0.8rem;">链接或账号</label>
+        <input id="support-url" placeholder="https://t.me/你的客服  或 mailto:you@xx.com  或 https://wa.me/60xxxx" style="width:100%;padding:10px;background:#0d1117;border:1px solid #30363d;color:#fff;border-radius:8px;">
+        <label style="display:block;margin:10px 0 4px;color:#8b949e;font-size:0.8rem;">前台说明文字</label>
+        <input id="support-text" placeholder="聊天与邮件快速客服。" style="width:100%;padding:10px;background:#0d1117;border:1px solid #30363d;color:#fff;border-radius:8px;">
+        <button type="button" class="btn" style="margin-top:12px;" onclick="saveSupport()">保存客服入口</button>
+        <div id="support-msg" style="margin-top:8px;font-size:0.85rem;color:#8b949e;"></div>
+      </div>
+<script>
+async function saveSupport(){
+  var cur = {};
+  try { cur = await (await fetch('../js/settings.json?t='+Date.now())).json(); } catch(e){}
+  cur.supportType = document.getElementById('support-type').value;
+  cur.supportUrl = document.getElementById('support-url').value.trim();
+  cur.supportText = document.getElementById('support-text').value.trim();
+  var r = await fetch('save-settings.php', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(cur) });
+  var t = await r.text();
+  document.getElementById('support-msg').textContent = t.indexOf('"ok"')>-1 ? '已保存，前台刷新即可' : t;
+}
+(async function(){
+  try{
+    var s = await (await fetch('../js/settings.json?t='+Date.now())).json();
+    if(s.supportType) document.getElementById('support-type').value = s.supportType;
+    if(s.supportUrl) document.getElementById('support-url').value = s.supportUrl;
+    if(s.supportText) document.getElementById('support-text').value = s.supportText;
+  }catch(e){}
+})();
+</script>
+
+</main>
   </div>
 
   <script>

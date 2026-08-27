@@ -136,7 +136,7 @@
         <span>Total</span>
         <span id="cart-total-price">$0.00</span>
       </div>
-      <button class="btn" style="width:100%;" onclick="location.href='checkout.html'">Checkout</button>
+      <button class="btn" style="width:100%;" onclick="alert('This is a demo. Checkout is not connected.')">Checkout</button>
     </div>
   </div>
 
@@ -181,40 +181,5 @@
 </script>
 
 <script src="js/i18n.js"></script>
-
-<script>
-(function(){
-  function bind(){
-    var nodes = Array.from(document.querySelectorAll('h3,h4,div,p,section,article'));
-    var target = null;
-    nodes.forEach(function(el){
-      var t = (el.textContent||'').replace(/\s+/g,' ');
-      if(t.indexOf('客服支持')>-1 || t.indexOf('Support')>-1 && t.indexOf('Fast, friendly')>-1 || t.indexOf('聊天与邮件')>-1){
-        if(!target || el.innerHTML.length < (target.innerHTML||'').length+200) target = el.closest('.feature') || el.closest('article') || el.parentElement || el;
-      }
-    });
-    if(!target) return;
-    target.style.cursor = 'pointer';
-    fetch('js/settings.json?t='+Date.now()).then(function(r){return r.json();}).then(function(s){
-      var url = s.supportUrl || '';
-      var type = s.supportType || 'link';
-      if(s.supportText){
-        var ps = target.querySelectorAll('p');
-        if(ps.length) ps[ps.length-1].textContent = s.supportText;
-      }
-      target.onclick = function(){
-        if(!url){ location.href='account.html'; return; }
-        if(type==='email' && url.indexOf('mailto:')!==0) url = 'mailto:'+url;
-        if(type==='telegram' && url.indexOf('http')!==0 && url.indexOf('tg:')!==0) url = 'https://t.me/'+url.replace('@','');
-        if(type==='whatsapp' && url.indexOf('http')!==0) url = 'https://wa.me/'+url.replace(/\D/g,'');
-        window.open(url, '_blank');
-      };
-    }).catch(function(){});
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', bind);
-  else bind();
-})();
-</script>
-
 </body>
 </html>

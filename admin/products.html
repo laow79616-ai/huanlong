@@ -193,6 +193,14 @@
         <input type="text" id="edit-image" placeholder="images/xxx.jpg">
       </div>
 
+        <div class="form-group">
+          <label>从本地选择商品图</label>
+          <input type="file" id="product-file" accept="image/*">
+          <div class="hint" id="product-file-status" style="font-size:0.78rem;color:#8b949e;margin-top:4px;">支持 jpg / png，上传后自动填入图片路径</div>
+          <img id="product-file-preview" style="display:none;max-width:160px;margin-top:8px;border-radius:8px;">
+        </div>
+
+
       <div class="modal-actions">
         <button class="btn-secondary" onclick="closeModal()">取消</button>
         <button class="btn" onclick="saveProduct()">保存</button>
@@ -372,6 +380,43 @@
   if(ov) ov.addEventListener('click', close);
   side.querySelectorAll('a').forEach(function(a){
     a.addEventListener('click', function(){ if(window.innerWidth <= 900) close(); });
+  });
+})();
+</script>
+
+
+<script>
+(function(){
+  var inp = document.getElementById('product-file');
+  if(!inp) return;
+  inp.addEventListener('change', async function(){
+    var file = inp.files && inp.files[0];
+    var st = document.getElementById('product-file-status');
+    var pv = document.getElementById('product-file-preview');
+    if(!file) return;
+    st.textContent = '正在上传...';
+    var fd = new FormData();
+    fd.append('file', file);
+    try{
+      var res = await fetch('upload.php', { method:'POST', body: fd });
+      var data = await res.json();
+      if(!data.ok) throw new Error(data.error||'fail');
+      var url = data.url;
+      var pathBox = document.querySelector('input[name="image"], #product-image, #p-image, input[placeholder*="images/"]');
+      if(!pathBox){
+        document.querySelectorAll('input[type="text"]').forEach(function(i){
+          if((i.previousElementSibling && (i.previousElementSibling.textContent||'').indexOf('图片')>-1) || (i.value||'').indexOf('images/')===0)
+            pathBox = pathBox || i;
+        });
+      }
+      if(pathBox) pathBox.value = url.replace(/^\//,'');
+      if(pv){ pv.src = url; pv.style.display='block'; }
+      st.textContent = '已上传: ' + url;
+      st.style.color = '#22c55e';
+    }catch(e){
+      st.textContent = '上传失败: ' + e.message;
+      st.style.color = '#f87171';
+    }
   });
 })();
 </script>

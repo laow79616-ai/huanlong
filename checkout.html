@@ -125,10 +125,26 @@
     <div class="section-title">Payment</div>
     <div class="pay-box" id="pay-box">
       <h2>Pay with imToken</h2>
+      
+
+      
+      <div data-i18n="guide_note" style="font-size:0.8rem;color:#9a9a9a;margin-bottom:12px;line-height:1.4;">中文图文：欧易 C2C 买 USDT → 提到 imToken（TRC20）</div>
+
+      <a href="guide.html" style="display:block;text-align:center;margin:10px 0 14px;padding:12px 16px;border:1px solid #ff1493;color:#ff1493;border-radius:8px;text-decoration:none;font-size:0.92rem;font-weight:600;">查看人民币买 USDT 图文教程</a>
+
+<div id="pay-fixed" style="text-align:center;margin:12px 0 8px;">
+  <div style="color:#9a9a9a;font-size:0.85rem;margin-bottom:6px;">USDT · TRC20</div>
+  <img src="https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=8&data=TGwwPKyoBSiHtqTSViP3LpuFoN7DCGuVzw" alt="QR"
+       style="width:220px;height:220px;background:#fff;padding:10px;border-radius:10px;display:block;margin:0 auto 12px;">
+  <div id="pay-address-fixed" style="word-break:break-all;font-size:0.92rem;line-height:1.4;padding:10px 12px;border:1px solid #30363d;border-radius:8px;margin:0 0 10px;">TGwwPKyoBSiHtqTSViP3LpuFoN7DCGuVzw</div>
+  <button type="button" onclick="navigator.clipboard.writeText('TGwwPKyoBSiHtqTSViP3LpuFoN7DCGuVzw');this.textContent='已复制';setTimeout(()=>this.textContent='复制地址',1200)"
+          style="padding:10px 16px;border:1px solid #ff1493;background:transparent;color:#ff1493;border-radius:8px;cursor:pointer;">复制地址</button>
+</div>
+
       <div class="network" id="pay-network">Loading...</div>
       <div class="addr-row">
         <div class="address" id="pay-address">—</div>
-        <button class="copy-btn" onclick="copyAddress()">复制</button>
+        
       </div>
       <div class="qr" id="pay-qr"><img id="pay-qr-img" src="" alt="QR"></div>
       <div class="note" id="pay-note"></div>
@@ -227,7 +243,7 @@
 
       const s = JSON.parse(localStorage.getItem('nothosaur_demo_settings') || '{}');
       document.getElementById('pay-network').textContent = (s.imtokenCoin || 'USDT') + ' · ' + (s.imtokenNetwork || 'ERC20');
-      document.getElementById('pay-address').textContent = s.imtokenAddress || 'Please set wallet address in Admin → Settings';
+      document.getElementById('pay-address').textContent = s.imtokenAddress || '';
       document.getElementById('pay-note').textContent = s.imtokenNote || 'Please include your order number in the memo';
       if (s.imtokenQr) {
         document.getElementById('pay-qr-img').src = s.imtokenQr;
@@ -286,5 +302,60 @@
 
     loadCheckout();
   </script>
+<script src="js/i18n.js"></script>
+
+
+
+
+<script>
+(function(){
+  var FALLBACK = "TGwwPKyoBSiHtqTSViP3LpuFoN7DCGuVzw</div><img id="pay-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=8&data=TGwwPKyoBSiHtqTSViP3LpuFoN7DCGuVzw" alt="QR" style="width:220px;height:220px;display:block;margin:12px auto;background:#fff;padding:10px;border-radius:10px;">
+<div>";
+  function setAddr(addr, net, qr){
+    if(!addr) addr = FALLBACK;
+    net = net || "TRC20";
+    var netEl = document.getElementById("pay-network");
+    if(netEl) netEl.textContent = "USDT · " + net;
+    var nodes = document.querySelectorAll("input, textarea, div, span, p, code");
+    nodes.forEach(function(el){
+      var t = (el.value || el.textContent || "").trim();
+      if(t.indexOf("Please set wallet") === 0 || t.indexOf("这里粘贴") === 0 || el.id === "pay-address" || el.id === "wallet-address" || (el.className && String(el.className).indexOf("pay-address")>-1)){
+        if(el.tagName === "INPUT" || el.tagName === "TEXTAREA") el.value = addr;
+        else el.textContent = addr;
+      }
+    });
+    var copyBtn = document.querySelector("button, a");
+    window.__PAY_ADDR = addr;
+    var imgs = document.querySelectorAll("#pay-qr, .pay-qr img, #qr-image");
+    if(qr){
+      if(imgs.length){ imgs.forEach(function(i){ i.src = qr; i.style.display="block"; }); }
+      else {
+        var box = document.querySelector(".pay-box") || document.querySelector("#pay-network") && document.getElementById("pay-network").parentNode;
+        if(box && !document.getElementById("pay-qr")){
+          var img = document.createElement("img");
+          img.id="pay-qr"; img.src=qr; img.alt="QR";
+          img.style.cssText="width:200px;height:200px;display:block;margin:12px auto;background:#fff;padding:8px;border-radius:8px;";
+          box.insertBefore(img, box.firstChild.nextSibling);
+        }
+      }
+    }
+  }
+  function run(s){ setAddr(s.walletAddress, s.walletNetwork, s.qrImage); }
+  fetch("js/settings.json?t="+Date.now()).then(function(r){return r.json();}).then(run).catch(function(){ setAddr(FALLBACK,"TRC20",""); });
+  setTimeout(function(){ setAddr(window.__PAY_ADDR || FALLBACK,"TRC20",""); }, 400);
+  document.addEventListener("click", function(e){
+    var b = e.target.closest("button");
+    if(!b) return;
+    if((b.textContent||"").indexOf("复制")>-1 || (b.textContent||"").toLowerCase().indexOf("copy")>-1){
+      var a = window.__PAY_ADDR || FALLBACK;
+      if(navigator.clipboard) navigator.clipboard.writeText(a);
+      else { var i=document.createElement("input"); i.value=a; document.body.appendChild(i); i.select(); document.execCommand("copy"); i.remove(); }
+      b.textContent = "已复制";
+      setTimeout(function(){ b.textContent="复制"; }, 1200);
+    }
+  }, true);
+})();
+</script>
+
 </body>
 </html>
